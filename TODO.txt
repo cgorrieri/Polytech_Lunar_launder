@@ -1,0 +1,5 @@
+A faire :
+- Un texte d'intro dans le fichier README.md (au format markdown)
+- Améliorer l'affichage des données car trop moche
+- Changement de repère (pour que lunar aille vers le bas)
+- Mettre une échèle (ex 5px pour un metre comme dans l'anim flash)
