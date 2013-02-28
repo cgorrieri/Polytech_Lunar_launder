@@ -1,4 +1,4 @@
-﻿Pour commiter :
+Pour commiter :
 $ gitg &
 
 pour mettre sur le serveur:
