@@ -1,0 +1,14 @@
+﻿Pour commiter :
+$ gitg &
+
+pour mettre sur le serveur:
+$ git push
+
+Pour récuperer les dernière mofifications:
+git pull
+
+si git pull marche pas car il y a des commits pas pusher ou des fichier modifier et pas commité faire:
+git stash
+git fetch
+git rebase origin/master
+git stash pop
