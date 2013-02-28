@@ -26,7 +26,7 @@ Quintus.LunarLaunder = function(Q) {
     step: function(dt) {
       var X=this.state;
       if(X[2] <= 0)
-        Q.stageScene("endGame",1, { label: "You crash" });
+        Q.stageScene("endGame",0, { label: "You crash" });
 
       var p = this.p;
       var ad = this.ad, bd = this.bd;
@@ -44,9 +44,11 @@ Quintus.LunarLaunder = function(Q) {
         this.multiply_4x(ad, X, 4),
         this.multiply_4x(bd,[0, -g/this.erg], 2)
       );
-
-      p.x = X[0];
-      p.y = X[2];
+    
+      // place lunar par rapport au repère en bas à gauche
+      // on definit ici une échelle de 4px pour un metre
+      p.x = X[0] * 4;
+      p.y = Q.height - X[2]*4;
       Q.panel.set({"te":(dt*1000).toFixed(0), "temps":(this.tVol+=dt).toFixed(1),
          "x_value":X[0].toFixed(2),
          "x_point":X[1].toFixed(2),
