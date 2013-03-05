@@ -5,3 +5,4 @@
 - FAIT : Mettre une échèle (ex 4px pour un metre comme dans l'anim flash)
 - Ajouter l'utilisation de la librairie http://sylvester.jcoglan.com/ pour le calcul matriciel
 - Faire en sorte que le point x/y de lunar se trouve en son bas
+- Regler le probleme de bouton qui ne reagit pas
