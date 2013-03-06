@@ -28,21 +28,9 @@ window.addEventListener("load",function() {
     dataPath:  "data/",
     audioSupported: [ 'mp3','ogg' ],
     sound: true,
-    frameTimeLimit: 100
+    frameTimeLimit: 40,
+    frameTimeApply: 40
   };
-
-  
-  
-    // Boucle de jeu 
-    // Q.gameLoop(function(dt) {
-    //   if(lunar.p.y > 0) {
-    //     lunar.update(dt);
-    //     Q.clear();
-    //     lunar.render(Q.ctx);
-    //   } else {
-    //     console.log("Fin");
-    //   }
-    // });
 
   // Le jeu
   Q.scene("game",function(stage) {
@@ -70,7 +58,6 @@ window.addEventListener("load",function() {
     });
     box.fit(20);
   });
-
 
   // Initialistaion 
   Q.load(["lunar.png"],function() {

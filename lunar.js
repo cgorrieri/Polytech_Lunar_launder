@@ -6,20 +6,23 @@ Quintus.LunarLaunder = function(Q) {
         x: 45,
         y: 51,
       });
+      te = this.Te = 0.04;
       this.state = [this.p.x, 1, this.p.y, -1]; // vecteur d'état de lunar
       this.mvide = 6839; // masse à  vide (kg)
       this.mfuel = 816.5;  // masse de carburant (kg) });
       this.m = this.mvide + this.mfuel;
       this.ve = 4500; // vitesse d'éjection des gaz (en m/s), ou specific impulse
       this.erg = this.ve/this.m; // epsilon
-      this.ad =  [[1,8,0,0],
+      this.ad =  [[1,te,0,0],
                   [0,1,0,0],
-                  [0,0,1,8],
+                  [0,0,1,te],
                   [0,0,0,1]];
-      this.bd = [[8,0],
-                  [9,0],
-                  [0,8],
-                  [0,9]];
+      a = this.erg*(te*te)/2;
+      b = this.erg*te;
+      this.bd = [[a,0],
+                  [b,0],
+                  [0,a],
+                  [0,b]];
       this.tVol = 0; // temps de vol de lunar
     },
     // fonction appelé à cheque boucle du jeu
@@ -30,12 +33,6 @@ Quintus.LunarLaunder = function(Q) {
 
       var p = this.p;
       var ad = this.ad, bd = this.bd;
-
-      // Change Te dans ad
-      ad[0][1]=ad[2][3]=dt;
-      // Change Te dans bd
-      bd[0][0]=bd[2][1]=this.erg*(dt*dt)/2;
-      bd[1][0]=bd[3][1]=this.erg*dt;
 
       //console.log(ad, X, bd, [0, -g/this.erg]);
 
@@ -49,7 +46,7 @@ Quintus.LunarLaunder = function(Q) {
       // on definit ici une échelle de 4px pour un metre
       p.x = X[0] * 4;
       p.y = Q.height - X[2]*4;
-      Q.panel.set({"te":(dt*1000).toFixed(0), "temps":(this.tVol+=dt).toFixed(1),
+      Q.panel.set({"te":(this.Te*1000).toFixed(0), "temps":(this.tVol+=this.Te).toFixed(1),
          "x_value":X[0].toFixed(2),
          "x_point":X[1].toFixed(2),
          "y_value":X[2].toFixed(2),
