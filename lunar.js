@@ -7,6 +7,7 @@ Quintus.LunarLaunder = function(Q) {
         y: 51,
       });
       te = this.Te = 0.04;
+      Q.panel.set({"te" : (te*1000).toFixed(0)});
       this.state = [this.p.x, 1, this.p.y, -1]; // vecteur d'état de lunar
       this.mvide = 6839; // masse à  vide (kg)
       this.mfuel = 816.5;  // masse de carburant (kg) });
@@ -46,7 +47,7 @@ Quintus.LunarLaunder = function(Q) {
       // on definit ici une échelle de 4px pour un metre
       p.x = X[0] * 4;
       p.y = Q.height - X[2]*4;
-      Q.panel.set({"te":(this.Te*1000).toFixed(0), "temps":(this.tVol+=this.Te).toFixed(1),
+      Q.panel.set({"temps":(this.tVol+=this.Te).toFixed(1),
          "x_value":X[0].toFixed(2),
          "x_point":X[1].toFixed(2),
          "y_value":X[2].toFixed(2),
