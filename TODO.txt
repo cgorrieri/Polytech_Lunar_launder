@@ -4,7 +4,9 @@
 - FAIT : Changement de repère (pour que lunar aille vers le bas)
 - FAIT : Mettre une échèle (ex 4px pour un metre comme dans l'anim flash)
 - FAIT : fixer Te à 40ms
-- Ajouter l'utilisation de la librairie http://sylvester.jcoglan.com/ pour le calcul matriciel
+- FAIT : Ajouter l'utilisation de la librairie http://sylvester.jcoglan.com/ pour le calcul matriciel
 - Faire en sorte que le point x/y de lunar se trouve en son bas
 - Regler le probleme de bouton qui ne reagit pas
 - Ajouter une image de fond dans le jeu et la page pour un effet espace
+- FAIT : Ajout des commandes manuelles
+- Message d'info lors de l'allunissage (crash, hard landing, vitesse d'aunissage etc)
