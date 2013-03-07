@@ -71,10 +71,21 @@ window.addEventListener("load",function() {
       x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
     }));
     
-    var button = box.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
-                                             label: "Play Again" }))         
-    var label = box.insert(new Q.UI.Text({x:10, y: -10 - button.p.h, 
-                                          label: stage.options.label }));
+    // Calcul de la vitesse d'alunissage
+    var ll = LunarLander;
+    var vitImpact = Math.sqrt(ll.state.e(2)*ll.state.e(2) + ll.state.e(4)*ll.state.e(4)).toFixed(2);
+    
+    // Text en fonction de la vitesse
+    var text_alunissage;
+    if(vitImpact < 2)       text_alunissage = "Alunissage en douceur";
+    else if(vitImpact < 12) text_alunissage = "Alunissage brutal";
+    else                    text_alunissage = "Crash de l'appareil";
+    
+           
+    var label = box.insert(new Q.UI.Text({x:10, y: 0, 
+                                          label: text_alunissage+"\nVitesse d'impact: "+vitImpact+"m/s" }));
+    var button = box.insert(new Q.UI.Button({ x: 0, y: 10+label.p.h, fill: "#CCCCCC",
+                                             label: "Play Again" }))  
     button.on("click",function() {
       console.log("click");
       Q.clearStages();
