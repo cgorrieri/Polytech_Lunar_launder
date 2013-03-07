@@ -59,6 +59,10 @@ Quintus.LunarLaunder = function(Q) {
     addAy: function(ay) {
       this.ay += ay;
       this.ud = $V([this.ax, this.ay - g/this.erg]);
+    },
+    stopMoteur: function() {
+      this.ax = this.ay = 0;
+      this.ud = $V([0, - g/this.erg]);
     }
   });
   return Q;

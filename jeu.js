@@ -20,7 +20,7 @@ window.addEventListener("load",function() {
   // canvas element on the page. If you already have a 
   // canvas element in your page, you can pass the element
   // or it's id as the first parameter to set up as well.
-  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, UI, LunarLaunder, LunarPanel").setup("game");
+  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, LunarLaunder, LunarPanel").setup("game").controls();
 
   Q.options = {
     imagePath: "images/",
@@ -33,14 +33,35 @@ window.addEventListener("load",function() {
   };
   
   // LunarLander
-  var LunarLander = new Q.Lunar();
+  var LunarLander;
 
   // Le jeu
   Q.scene("game",function(stage) {
     // initialisation du panel
     Q.panel = new Q.PanelState();
-
+    LunarLander = new Q.Lunar();
     stage.insert(LunarLander);
+    
+    // Affectation des touches
+    Q.input.on('up', stage, function(e) {
+      LunarLander.addAy(1);
+    });
+    
+    Q.input.on('down', stage, function(e) {
+      LunarLander.addAy(-1);
+    });
+    
+    Q.input.on('left', stage, function(e) {
+      LunarLander.addAx(-1);
+    });
+    
+    Q.input.on('right', stage, function(e) {
+      LunarLander.addAx(1);
+    });
+    
+    Q.input.on('fire', stage, function(e) {
+      LunarLander.stopMoteur();
+    });
   });
 
 
@@ -60,23 +81,6 @@ window.addEventListener("load",function() {
       Q.stageScene('game');
     });
     box.fit(20);
-  });
-  
-  // Affectation des touches
-  Q.input.on('up', stage, function(e) {
-	
-  });
-  
-  Q.input.on('down', stage, function(e) {
-	
-  });
-  
-  Q.input.on('left', stage, function(e) {
-	LunarLander.addAx(-1);
-  });
-  
-  Q.input.on('right', stage, function(e) {
-	LunarLander.addAx(1);
   });
 
   // Initialisation 
