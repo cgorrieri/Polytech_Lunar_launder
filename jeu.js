@@ -31,13 +31,16 @@ window.addEventListener("load",function() {
     frameTimeLimit: 40,
     frameTimeApply: 40
   };
+  
+  // LunarLander
+  var LunarLander = new Q.Lunar();
 
   // Le jeu
   Q.scene("game",function(stage) {
     // initialisation du panel
     Q.panel = new Q.PanelState();
 
-    stage.insert(new Q.Lunar());
+    stage.insert(LunarLander);
   });
 
 
@@ -58,8 +61,25 @@ window.addEventListener("load",function() {
     });
     box.fit(20);
   });
+  
+  // Affectation des touches
+  Q.input.on('up', stage, function(e) {
+	
+  });
+  
+  Q.input.on('down', stage, function(e) {
+	
+  });
+  
+  Q.input.on('left', stage, function(e) {
+	LunarLander.addAx(-1);
+  });
+  
+  Q.input.on('right', stage, function(e) {
+	LunarLander.addAx(1);
+  });
 
-  // Initialistaion 
+  // Initialisation 
   Q.load(["lunar.png"],function() {
     Q.stageScene("game");
   });
