@@ -6,6 +6,10 @@ Quintus.LunarLaunder = function(Q) {
         x: 45,
         y: 51,
       });
+      
+      // Met le point de référence du lunar en son bas
+      this.p.cy = this.p.h;
+      
       te = this.Te = 0.04;
       Q.panel.set({"te" : (te*1000).toFixed(0)});
       this.state = $V([this.p.x, 1, this.p.y, -1]); // vecteur d'état de lunar
