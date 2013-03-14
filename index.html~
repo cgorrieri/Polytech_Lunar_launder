@@ -44,7 +44,6 @@
       <p>vx (m/s)<input type="text" id="x_point"/></p>
       <p>y (m)<input type="text" id="y_value"/></p>
       <p>vy (m/s)<input type="text" id="y_point"/></p>
-      <p>Fuel consommé<input type="text" id="fuelCons"/></p>
     </div>
   </body>
 </html>

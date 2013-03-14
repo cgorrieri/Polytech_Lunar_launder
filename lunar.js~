@@ -39,7 +39,7 @@ Quintus.LunarLaunder = function(Q) {
       var p = this.p;
       var ad = this.ad, bd = this.bd, ud = this.ud;
 
-      this.mfuelCons=  (Math.abs(this.ax) + Math.abs(this.ay))*this.tVol;
+      this.mfuelCons=  (Math.abs(this.ax) + Math.abs(this.ay))*this.tVol; // soit dt soit tu laisse tvol mais tu fait pas +=
 
       //console.log(ad, X, bd, [0, -g/this.erg]);
 
