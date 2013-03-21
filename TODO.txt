@@ -11,3 +11,4 @@
 - FAIT : Ajout des commandes manuelles
 - FAIT : Message d'info lors de l'allunissage (crash, hard landing, vitesse d'aunissage etc)
 - Ne pas afficherle fuel consomé mais le fuel restant par rapport au fuel de départ (voir appli flash)
+- Ajouter un panel pour modifier les valeurs propres dans la commande par retours d'état
