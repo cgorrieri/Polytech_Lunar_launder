@@ -89,11 +89,11 @@ Quintus.LunarLaunder = function(Q) {
             
       this._updateState();
     },
-    AddAx: function(ax) {
+    addAx: function(ax) {
       this.Un = this.Un.add([ax, 0]);
       this.ax = this.Un.e(1);
     },
-    AddAy: function(ay) {
+    addAy: function(ay) {
       this.ay += ay;
       this.Un = $V([this.ax, this.ay - g/this.erg]);
     },

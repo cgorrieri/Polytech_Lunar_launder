@@ -32,17 +32,11 @@ window.addEventListener("load",function() {
     frameTimeApply: 40
   };
   
-  /*Quintus.Input.KEY_NAMES.M = { LEFT: 37, RIGHT: 39, SPACE: 32,
-                    UP: 38, DOWN: 40,
-                    Z: 90, X: 88   
-                  };
+  // ajout du 'm' pour la commande manuelle
+  Q.input.bindKey(77, "manual");
   
-  var DEFAULT_KEYS = { LEFT: 'left', RIGHT: 'right',
-                       UP: 'up',     DOWN: 'down',
-                       SPACE: 'fire',
-                       Z: 'fire',
-                       X: 'action' };
-                    */
+  // ajout du 'e' pour la commande par retours d'état
+  Q.input.bindKey(69, "retEtat");
   
   // LunarLander
   var LunarLander;
@@ -52,9 +46,8 @@ window.addEventListener("load",function() {
     // initialisation du panel
     Q.panel = new Q.PanelState();
     LunarLander = new Q.Lunar();
-    //LunarLander.step = LunarLander.commandeManuel;
-    LunarLander.step = LunarLander.commandeRetourEtat;
     stage.insert(LunarLander);
+    LunarLander.step = LunarLander.commandeManuel;
     
     // Affectation des touches
     Q.input.on('up', stage, function(e) {
@@ -75,6 +68,14 @@ window.addEventListener("load",function() {
     
     Q.input.on('fire', stage, function(e) {
       LunarLander.stopMoteur();
+    });
+    
+    Q.input.on('manual', stage, function(e) {
+      LunarLander.step = LunarLander.commandeManuel;
+    });
+    
+    Q.input.on('retEtat', stage, function(e) {
+      LunarLander.step = LunarLander.commandeRetourEtat;
     });
   });
 
