@@ -20,7 +20,7 @@ window.addEventListener("load",function() {
   // canvas element on the page. If you already have a 
   // canvas element in your page, you can pass the element
   // or it's id as the first parameter to set up as well.
-  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, LunarLaunder, LunarPanel").setup("game").controls();
+  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, LunarLaunder, LunarPanel, Observeur").setup("game").controls();
 
   Q.options = {
     imagePath: "images/",
@@ -40,6 +40,11 @@ window.addEventListener("load",function() {
   
   // LunarLander
   var LunarLander;
+
+  Q.scene("observe",function(stage) {
+    stage.insert(new Q.Observateur);
+    stage.insert(new Q.Mobile({x:0, y:0}));
+  });
 
   // Le jeu
   Q.scene("game",function(stage) {
@@ -110,7 +115,7 @@ window.addEventListener("load",function() {
   });
 
   // Initialisation 
-  Q.load(["lunar.png"],function() {
-    Q.stageScene("game");
+  Q.load(["lunar.png", "observer.png"],function() {
+    Q.stageScene("observe");
   });
 });
