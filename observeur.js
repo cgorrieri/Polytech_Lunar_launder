@@ -27,7 +27,8 @@ Quintus.Observeur = function(Q) {
       this.p.x = this.X * 4;
       this.p.y = Q.height - this.Y*4;
 	  
-	  teta.push(Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)));
+	  this.teta.push({x:this.X, y:this.Y,
+		angle:(Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)))});
     }
   });
 
@@ -51,7 +52,6 @@ Quintus.Observeur = function(Q) {
       
       this.p.x = this.X * 4;
       this.p.y = Q.height - this.Y*4;
-      console.log(this.p.x);
     }
   });
   return Q;
