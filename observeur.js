@@ -10,13 +10,15 @@ Quintus.Observeur = function(Q) {
       this.X = this.p.x;
       this.Y = this.p.y;
       this.V = 10;
-      this.teta = 0;
+	  this.angleRotation = 0;
+	  this.mobile = p.mobile;
+	  this.teta = new Array();
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
-      this.teta += 0.03;
-      this.vx = this.V * Math.cos(this.teta);
-      this.vy = this.V * Math.sin(this.teta);
+      this.angleRotation += 0.03;
+      this.vx = this.V * Math.cos(this.angleRotation);
+      this.vy = this.V * Math.sin(this.angleRotation);
 
       this.X += this.vx * dt;
       
@@ -24,6 +26,8 @@ Quintus.Observeur = function(Q) {
       
       this.p.x = this.X * 4;
       this.p.y = Q.height - this.Y*4;
+	  
+	  teta.push(Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)));
     }
   });
 

@@ -42,8 +42,9 @@ window.addEventListener("load",function() {
   var LunarLander;
 
   Q.scene("observe",function(stage) {
-    stage.insert(new Q.Observateur);
-    stage.insert(new Q.Mobile({x:0, y:0}));
+    var mobile = new Q.Mobile({x:0, y:0});
+    stage.insert(new Q.Observateur({mobile:mobile}));
+    stage.insert(mobile);
   });
 
   // Le jeu
