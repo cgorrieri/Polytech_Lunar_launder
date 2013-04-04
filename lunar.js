@@ -115,11 +115,17 @@ Quintus.LunarLaunder = function(Q) {
              "x_point": X.e(2).toFixed(2),
              "y_value": X.e(3).toFixed(2),
              "y_point": X.e(4).toFixed(2),
-       "fuelCons": this.mfuelCons.toFixed(2)
+       "fuelRest": this.mfuel.toFixed(2)
       });
     },
     _calculFuel : function() {
       this.mfuelCons = (Math.abs(this.ax) + Math.abs(this.ay))*this.tVol;
+					if(this.mfuel<0)  
+					{this.mfuel=0;
+					this.ax=0;
+					this.ay=0;}  
+					else{this.fuel -= this.mfuelCons;}  
+      
     }
 
   });
