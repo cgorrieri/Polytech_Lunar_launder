@@ -31,6 +31,16 @@ Quintus.LunarPanel = function(Q) {
     get: function(property) {
       return this.p[property];
     }
+    
+    // hide a group in the panel
+    hide: function(group_id) {
+      document.getElementById(group_id).style.display="none";
+    }
+    
+    // show a group in the panel
+    show: function(group_id) {
+      document.getElementById(group_id).style.display="block";
+    }
   });
 
   return Q;
