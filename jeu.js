@@ -43,7 +43,7 @@ window.addEventListener("load",function() {
 
   Q.scene("observe",function(stage) {
     var mobile = new Q.Mobile({x:0, y:0});
-    stage.insert(new Q.Observateur({mobile:mobile}));
+    stage.insert(new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile}));
     stage.insert(mobile);
   });
 

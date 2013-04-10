@@ -3,32 +3,33 @@ Quintus.Observeur = function(Q) {
   Q.Sprite.extend("Observateur",{
     init: function(p) {
       this._super(p, { asset: "observer.png",
-        x: 45,
-        y: 51,
+        x: 0,
+        y: 0,
         scale: 0.5
       });
       this.X = this.p.x;
       this.Y = this.p.y;
       this.V = 10;
-	  this.angleRotation = 0;
-	  this.mobile = p.mobile;
-	  this.teta = new Array();
+      this.angleRotation = (p.angle ? p.angle : 0);
+      this.mobile = p.mobile;
+      this.teta = new Array();
+      this.vxSuivre = this.vySuivre = 5;
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
-      this.angleRotation += 0.03;
+      this.angleRotation += 0.02;
       this.vx = this.V * Math.cos(this.angleRotation);
       this.vy = this.V * Math.sin(this.angleRotation);
 
-      this.X += this.vx * dt;
+      this.X += (this.vx+this.vxSuivre) * dt;
       
-      this.Y += this.vy * dt;
+      this.Y += (this.vy+this.vySuivre) * dt;
       
       this.p.x = this.X * 4;
       this.p.y = Q.height - this.Y*4;
 	  
-	  this.teta.push({x:this.X, y:this.Y,
-		angle:(Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)))});
+      this.teta.push({x:this.X, y:this.Y,
+        angle:(Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)))});
     }
   });
 
