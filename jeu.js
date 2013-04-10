@@ -51,7 +51,7 @@ window.addEventListener("load",function() {
   Q.scene("game",function(stage) {
     // initialisation du panel
     Q.panel = new Q.PanelState();
-    LunarLander = new Q.LunarManual({x:45, y:51});
+    LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
     stage.insert(LunarLander);
     
     // Affectation des touches
@@ -75,15 +75,17 @@ window.addEventListener("load",function() {
       LunarLander.space();
     });
     
+    // change le lunar courrant par un lunar à comande manuelle
     Q.input.on('manual', stage, function(e) {
       stage.remove(LunarLander);
-      LunarLander = new Q.LunarManual({x:LunarLander.X, y:LunarLander.X, state:LunarLander.state});
+      LunarLander = new Q.LunarManual({state:LunarLander.state});
       stage.insert(LunarLander);
     });
     
+    // change le lunar courrant par un lunar à comande par retour d'état
     Q.input.on('retEtat', stage, function(e) {
       stage.remove(LunarLander);
-      LunarLander = new Q.LunarRetourEtat({x:LunarLander.X, y:LunarLander.Y, state:LunarLander.state});
+      LunarLander = new Q.LunarRetourEtat({state:LunarLander.state});
       stage.insert(LunarLander);
     });
   });
