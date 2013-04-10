@@ -51,37 +51,40 @@ window.addEventListener("load",function() {
   Q.scene("game",function(stage) {
     // initialisation du panel
     Q.panel = new Q.PanelState();
-    LunarLander = new Q.Lunar();
+    LunarLander = new Q.LunarManual({x:45, y:51});
     stage.insert(LunarLander);
-    LunarLander.step = LunarLander.commandeManuel;
     
     // Affectation des touches
     Q.input.on('up', stage, function(e) {
-      LunarLander.addAy(1);
+      LunarLander.up();
     });
     
     Q.input.on('down', stage, function(e) {
-      LunarLander.addAy(-1);
+      LunarLander.down();
     });
     
     Q.input.on('left', stage, function(e) {
-      LunarLander.addAx(-1);
+      LunarLander.left();
     });
     
     Q.input.on('right', stage, function(e) {
-      LunarLander.addAx(1);
+      LunarLander.right();
     });
     
     Q.input.on('fire', stage, function(e) {
-      LunarLander.stopMoteur();
+      LunarLander.space();
     });
     
     Q.input.on('manual', stage, function(e) {
-      LunarLander.step = LunarLander.commandeManuel;
+      stage.remove(LunarLander);
+      LunarLander = new Q.LunarManual({x:LunarLander.X, y:LunarLander.X, state:LunarLander.state});
+      stage.insert(LunarLander);
     });
     
     Q.input.on('retEtat', stage, function(e) {
-      LunarLander.step = LunarLander.commandeRetourEtat;
+      stage.remove(LunarLander);
+      LunarLander = new Q.LunarRetourEtat({x:LunarLander.X, y:LunarLander.Y, state:LunarLander.state});
+      stage.insert(LunarLander);
     });
   });
 
@@ -117,6 +120,6 @@ window.addEventListener("load",function() {
 
   // Initialisation 
   Q.load(["lunar.png", "observer.png"],function() {
-    Q.stageScene("observe");
+    Q.stageScene("game");
   });
 });

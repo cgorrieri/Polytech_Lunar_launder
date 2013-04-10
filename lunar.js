@@ -5,23 +5,19 @@ Quintus.LunarLaunder = function(Q) {
   Q.Sprite.extend("Lunar",{
     init: function(p) {
       this._super(p, { asset: "lunar.png",
-        x: 45,
-        y: 51,
+        x: 0,
+        y: 0,
       });
       
-      /* Commandes:
-         0 : commande manuelle
-         1 : commande par retours d'état
-         2 : commande optimale
-      */
-      this.commande = 0;
-
       // Met le point de référence du lunar en son bas
       this.p.cy = this.p.h;
-      
+      this.X = this.Y = 0;
       te = this.Te = 0.04;
       Q.panel.set({"te" : (te*1000).toFixed(0)});
-      this.state = $V([this.p.x, 1, this.p.y, -1]); // vecteur d'état de lunar
+      if(p.state)
+        this.state = p.state;
+      else
+        this.state = $V([this.p.x, 1, this.p.y, -1]); // vecteur d'état de lunar
       this.mvide = 6839; // masse à  vide (kg)
       this.mfuel = 816.5;  // masse de carburant (kg) });
       this.mfuelCons= 0;
@@ -40,75 +36,22 @@ Quintus.LunarLaunder = function(Q) {
                   [0,b]]);
       this.ax = this.ay = 0;
       this.Un = $V([this.ax, this.ay - g/this.erg]);
-      this.tVol = 0; // temps de vol de lunar
-      
-      // COMMANDE PAR RETOUR D'ETAT
-      this.Cn = $V([0, 0, 0, 0]);
-      this.matGluneErg = $V([0, g/this.erg]);
-      
+      this.tVol = 0; // temps de vol de lunar      
     },
     // fonction appelé à cheque boucle du jeu
-    step: function(dt) {
-    
-    },    
-    commandeManuel:function(dt) {
-      var X=this.state;
-      if(X.e(3) <= 0)
-        Q.stageScene("endGame",0, { label: "You crash" });
-
-      var p = this.p;
-      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
-
-      this._calculFuel();
-
-      //console.log(Ad, X, Bd, [0, -g/this.erg]);
-
-      // Calcule du nouveau vecteur d'état
-      this.state = (Ad.x(X)).add(Bd.x(this.Un));
-            
-      this._updateState();
-    },
-    commandeRetourEtat:function(dt) {
-      var X=this.state;
-      if(X.e(3) <= 0)
-        Q.stageScene("endGame",0, { label: "You crash" });
-
-      var p = this.p;
-      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
-      
-      // Récuperer axn et ayn
-      axy = valPropres.x(this.Cn.subtract(X));
-      this.ax = axy.e(1);
-      this.ay = axy.e(2);
-
-      this._calculFuel();
-      
-      // Calcule du nouveau vecteur d'état
-      /*            (   Ad    -      Bd.K        ) .  Xn     +   Bb   .   K    .   Cn        -   Bd  . (0, Glune/erg)*/
-      this.state = ((Ad.subtract(Bd.x(valPropres))).x(X)).add(Bd.x(valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
-            
-      this._updateState();
-    },
-    addAx: function(ax) {
-      this.Un = this.Un.add([ax, 0]);
-      this.ax = this.Un.e(1);
-    },
-    addAy: function(ay) {
-      this.ay += ay;
-      this.Un = $V([this.ax, this.ay - g/this.erg]);
-    },
-    stopMoteur: function() {
-      this.ax = this.ay = 0;
-      this.Un = $V([0, - g/this.erg]);
-    },
-    
+    step: function(dt) { },
+    up: function() {},
+    down: function() {},
+    right: function() {},
+    left: function() {},
+    space: function() {},    
     // Methode utile
     _updateState : function() {
       var X = this.state;
       // place lunar par rapport au repère en bas à gauche
       // on definit ici une échelle de 4px pour un metre
-      this.p.x = X.e(1) * 4;
-      this.p.y = Q.height - X.e(3)*4;
+      this.p.x = (this.X = X.e(1)) * 4;
+      this.p.y = Q.height - (this.Y = X.e(3))*4;
       Q.panel.set({
        "temps":(this.tVol+=this.Te).toFixed(1),
              "x_value": X.e(1).toFixed(2),
@@ -125,9 +68,95 @@ Quintus.LunarLaunder = function(Q) {
 					this.ax=0;
 					this.ay=0;}  
 					else{this.fuel -= this.mfuelCons;}  
-      
     }
 
+  });
+  
+  Q.Lunar.extend("LunarManual",{
+    init: function(p) {
+      this._super(p, { });
+    },
+    // fonction appelé à cheque boucle du jeu
+    step: function(dt) {
+      var X=this.state;
+      if(X.e(3) <= 0)
+        Q.stageScene("endGame",0, { label: "You crash" });
+
+      var p = this.p;
+      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
+
+      this._calculFuel();
+
+      //console.log(Ad, X, Bd, [0, -g/this.erg]);
+
+      // Calcule du nouveau vecteur d'état
+      this.state = (Ad.x(X)).add(Bd.x(this.Un));
+            
+      this._updateState();
+    },
+    up: function() {this.addAy(1);},
+    down: function() {this.addAy(-1);},
+    right: function() {this.addAx(1);},
+    left: function() {this.addAx(-1);},
+    space: function() {this.stopMoteur();},
+    addAx: function(ax) {
+      this.Un = this.Un.add([ax, 0]);
+      this.ax = this.Un.e(1);
+    },
+    addAy: function(ay) {
+      this.ay += ay;
+      this.Un = $V([this.ax, this.ay - g/this.erg]);
+    },
+    stopMoteur: function() {
+      this.ax = this.ay = 0;
+      this.Un = $V([0, - g/this.erg]);
+    },
+  });
+  
+  Q.Lunar.extend("LunarRetourEtat",{
+    init: function(p) {
+      this._super(p, { });
+      this.target = p.target;
+      this.Cn = $V([0, 0, 0, 0]);
+      this.matGluneErg = $V([0, g/this.erg]);
+    },
+    // fonction appelé à cheque boucle du jeu
+    step: function(dt) {
+      var X=this.state;
+      if(X.e(3) <= 0)
+        Q.stageScene("endGame",0, { label: "You crash" });
+
+      var p = this.p;
+      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
+      
+      // Récuperer axn et ayn
+      axy = valPropres.x(this.Cn.subtract(X));
+      this.ax = axy.e(1);
+      this.ay = axy.e(2);
+
+      this._calculFuel();
+      
+      console.log(X);
+      
+      // Calcule du nouveau vecteur d'état
+      /*            (   Ad    -      Bd.K        ) .  Xn     +   Bb   .   K    .   Cn        -   Bd  . (0, Glune/erg)*/
+      this.state = ((Ad.subtract(Bd.x(valPropres))).x(X)).add(Bd.x(valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
+            
+      this._updateState();
+    },
+    up: function() {this.addTargetY(1);},
+    down: function() {this.addTargetY(-1);},
+    right: function() {this.addTargetX(1);},
+    left: function() {this.addTargetX(-1);},
+    space: function() {},
+    addTargetX: function(ax) {
+      this.Un = this.Un.add([ax, 0]);
+      this.ax = this.Un.e(1);
+    },
+    addTargetY: function(ay) {
+      this.ay += ay;
+      this.Un = $V([this.ax, this.ay - g/this.erg]);
+    },
   });
   return Q;
 };
