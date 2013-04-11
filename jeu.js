@@ -20,16 +20,14 @@ window.addEventListener("load",function() {
   // canvas element on the page. If you already have a 
   // canvas element in your page, you can pass the element
   // or it's id as the first parameter to set up as well.
-  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, LunarLaunder, LunarPanel, Observeur").setup("game").controls();
-
+  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, LunarLaunder, LunarPanel, Observeur").setup("game").controls().touch();
   Q.options = {
     imagePath: "images/",
     audioPath: "audio/",
     dataPath:  "data/",
     audioSupported: [ 'mp3','ogg' ],
     sound: true,
-    frameTimeLimit: 40,
-    frameTimeApply: 40
+    frameTimeLimit: 40
   };
   
   // ajout du 'm' pour la commande manuelle
@@ -38,6 +36,18 @@ window.addEventListener("load",function() {
   // ajout du 'e' pour la commande par retours d'état
   Q.input.bindKey(69, "retEtat");
   
+  _fixe = function(dt) {
+      if(dt>= Q.options.frameTimeLimit) return;
+      // fixe dt à Te
+      lastGameLoopFrame = new Date().getTime()+(dt*1000);
+      var now;
+      do{
+        now = new Date().getTime();
+        dt = now - Q.lastGameLoopFrame;
+      } while(dt < Q.options.frameTimeLimit);
+      return dt;
+    }
+  
   // LunarLander
   var LunarLander;
 
@@ -45,6 +55,10 @@ window.addEventListener("load",function() {
     var mobile = new Q.Mobile({x:0, y:0});
     stage.insert(new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile}));
     stage.insert(mobile);
+    Q.gameLoop(function(dt) {
+      _fixe(dt);
+      Q.stageGameLoop(dt);
+    });
   });
 
   // Le jeu
@@ -88,6 +102,11 @@ window.addEventListener("load",function() {
       LunarLander = new Q.LunarRetourEtat({state:LunarLander.state});
       stage.insert(LunarLander);
     });
+    
+    Q.gameLoop(function(dt) {
+      _fixe(dt);
+      Q.stageGameLoop(dt);
+    });
   });
 
 
@@ -111,8 +130,8 @@ window.addEventListener("load",function() {
     var label = box.insert(new Q.UI.Text({x:10, y: 0, 
                                           label: text_alunissage+"\nVitesse d'impact: "+vitImpact+"m/s" }));
     var button = box.insert(new Q.UI.Button({ x: 0, y: 10+label.p.h, fill: "#CCCCCC",
-                                             label: "Play Again" }))  
-    button.on("click",function() {
+                                             label: "Play Again", type: Q.SPRITE_UI }));
+    button.on("click", function() {
       console.log("click");
       Q.clearStages();
       Q.stageScene('game');
