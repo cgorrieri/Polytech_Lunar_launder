@@ -57,3 +57,17 @@ Quintus.Observeur = function(Q) {
   });
   return Q;
 };
+
+
+  //fonction qui calcule le bruit 
+ 
+ /*   bruit: function(k) {
+        x: 0;
+        w: 0;
+     
+     	for(var i=0;i<32;i)
+	{
+	x+=Math.random()-0.5; 
+	}
+	w=(x/32)*k;//k : gain
+     }*/

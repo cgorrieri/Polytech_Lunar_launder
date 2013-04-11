@@ -83,11 +83,12 @@ Quintus.LunarLaunder = function(Q) {
     // Calcul du fuel
     _calculFuel : function() {
       this.mfuelCons = (Math.abs(this.ax) + Math.abs(this.ay))*this.tVol;
+ 					this.mfuel -= this.mfuelCons;
 					if(this.mfuel<0)  
 					{this.mfuel=0;
 					this.ax=0;
 					this.ay=0;}  
-					else{this.fuel -= this.mfuelCons;}  
+					else{this.mfuel -= this.mfuelCons;}  
     }
 
   });
