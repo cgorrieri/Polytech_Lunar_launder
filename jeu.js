@@ -141,6 +141,6 @@ window.addEventListener("load",function() {
 
   // Initialisation 
   Q.load(["lunar.png", "observer.png"],function() {
-    Q.stageScene("game");
+    Q.stageScene("observe");
   });
 });
