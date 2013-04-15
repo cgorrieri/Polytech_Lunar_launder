@@ -174,7 +174,7 @@ window.addEventListener("load",function() {
                                              label: "Play Again", type: Q.SPRITE_UI }));
     button.on("click", function() {
       Q.clearStages();
-      Q.stageScene('game');
+      Q.stageScene('lunarGame');
     });
     box.fit(20);
   });
