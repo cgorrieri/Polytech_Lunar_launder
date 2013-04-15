@@ -29,7 +29,7 @@ Quintus.LunarPanel = function(Q) {
 
     // Return an individual property
     get: function(property) {
-      return this.p[property];
+      return this.dom[property].value;
     },
     
     // hide a group in the panel

@@ -38,6 +38,9 @@
         width:80px;
         text-align:left;
       }
+      #game_container {
+        margin:0px !important;
+      }
       #panel, #game {
         float:left;
       }
@@ -45,6 +48,9 @@
         padding:5px;
         background-color:#AAAAAA;
         border:2px solid black;
+      }
+      #panel {
+        display:none;
       }
       #game {
         border:2px solid black;
@@ -55,21 +61,25 @@
     <h1>Lunar Launder</h1>
     <canvas id="game" width='650' height='600'></canvas>
     <div id="panel">
-      <h2>Control</h2>
-      <p><label>Te (ms)</label><input type="text" id="te"/></p>
-      <p><label>T vol </label><input type="text" id="temps"/></p>
-      <h3>Vecteur d'état</h3>
-      <p><label>x (m)</label><input type="text" id="x_value"/></p>
-      <p><label>vx (m/s)</label><input type="text" id="x_point"/></p>
-      <p><label>y (m)</label><input type="text" id="y_value"/></p>
-      <p><label>vy (m/s)</label><input type="text" id="y_point"/></p>
-      <p><label>Fuel restant</label><input type="text" id="fuelRest"/></p>
+      <div id="observer">
+        <p><input type="submit" value="Lancer" onclick="alert('A FAIRE');">
+      </div>
+      <div id="state">
+        <h2>Control</h2>
+        <p><label>Te (ms)</label><input type="text" id="te"/></p>
+        <p><label>T vol </label><input type="text" id="temps"/></p>
+        <h3>Vecteur d'état</h3>
+        <p><label>x (m)</label><input type="text" id="x_value"/></p>
+        <p><label>vx (m/s)</label><input type="text" id="x_point"/></p>
+        <p><label>y (m)</label><input type="text" id="y_value"/></p>
+        <p><label>vy (m/s)</label><input type="text" id="y_point"/></p>
+        <p><label>Fuel restant</label><input type="text" id="fuelRest"/></p>
+      </div>
       <div id="valPropres">
         <h2>Valeurs Propres</h2>
-        <p><input type="text" id="11"/> <input type="text" id="12"/> <input type="text" id="13"/></p>
-        <p><input type="text" id="21"/> <input type="text" id="22"/> <input type="text" id="23"/></p>
-        <p><input type="text" id="31"/> <input type="text" id="32"/> <input type="text" id="33"/></p>
-        <p><input type="submit" value="ok">
+        <p><input type="text" id="11"/> <input type="text" id="12"/> <input type="text" id="13"/> <input type="text" id="14"/></p>
+        <p><input type="text" id="21"/> <input type="text" id="22"/> <input type="text" id="23"/> <input type="text" id="24"/></p>
+        <p><input type="submit" value="ok" onclick="Q.setValPropres();">
       </div>
     </div>
   </body>

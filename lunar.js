@@ -1,6 +1,4 @@
 Quintus.LunarLaunder = function(Q) {
-  var valPropres = $M([[0.33,		1.11,		0.0,	0.0],
-                      [0.0,		0.0,		0.33,	1.11]]);
   var g=1.6; //attraction lunaire (en m/s^2)
   
   /* Class Lunar de base sans aucun calcul
@@ -143,13 +141,13 @@ Quintus.LunarLaunder = function(Q) {
       var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
       
       // Récuperer axn et ayn
-      axy = valPropres.x(this.Cn.subtract(X));
+      axy = Q.valPropres.x(this.Cn.subtract(X));
       this.ax = axy.e(1);
       this.ay = axy.e(2);
       
       // Calcule du nouveau vecteur d'état
-      //            (   Ad    -      Bd.K        ) .  Xn     +   Bb   .   K    .   Cn        -   Bd  . (0, Glune/erg)
-      this.state = ((Ad.subtract(Bd.x(valPropres))).x(X)).add(Bd.x(valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
+      //            (   Ad    -   Bd .    K        ) .  Xn     +   Bb   .   K    .   Cn            -      Bd  . (0, Glune/erg)
+      this.state = ((Ad.subtract(Bd.x(Q.valPropres))).x(X)).add(Bd.x(Q.valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
     },
     up: function() {this.addTargetY(1);},
     down: function() {this.addTargetY(-1);},

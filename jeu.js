@@ -36,6 +36,19 @@ window.addEventListener("load",function() {
   // ajout du 'e' pour la commande par retours d'état
   Q.input.bindKey(69, "retEtat");
   
+  Q.valPropres = $M([[0.33,		1.11,		0.0,	0.0],
+                      [0.0,		0.0,		0.33,	1.11]]);
+  // Set ValPropres to panel
+  // initialisation du panel
+  Q.panel = new Q.PanelState();
+  Q.panel.set({"11":0.33,	"12":1.11,"13":0.0,	"14":0.0,
+               "21":0.0,	"22":0.0,	"23":0.33,"24":1.11})
+               
+  Q.setValPropres = function() {
+    Q.valPropres = $M([[parseFloat(Q.panel.get("11")),parseFloat(Q.panel.get("12")),parseFloat(Q.panel.get("13")),parseFloat(Q.panel.get("14"))],
+                      [parseFloat(Q.panel.get("21")),parseFloat(Q.panel.get("22")),parseFloat(Q.panel.get("23")),parseFloat(Q.panel.get("24"))]]);
+  }
+  
   _fixe = function(dt) {
       if(dt>= Q.options.frameTimeLimit) return;
       // fixe dt à Te
@@ -51,7 +64,7 @@ window.addEventListener("load",function() {
   // LunarLander
   var LunarLander;
 
-  Q.scene("observe",function(stage) {
+  Q.scene("observerGame",function(stage) {
     var mobile = new Q.Mobile({x:0, y:0});
     stage.insert(new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile}));
     stage.insert(mobile);
@@ -61,10 +74,30 @@ window.addEventListener("load",function() {
     });
   });
 
-  // Le jeu
-  Q.scene("game",function(stage) {
-    // initialisation du panel
-    Q.panel = new Q.PanelState();
+  Q.scene("main_menu",function(stage) {
+    var box = stage.insert(new Q.UI.Container({
+      x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+    }));
+    
+    var lunarGame = box.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
+                                             label: "Loi de commandes", type: Q.SPRITE_UI },
+                                             function() {
+                                              Q.clearStages();
+                                              Q.panel.show("state");
+                                              Q.stageScene('lunarGame');
+                                             }));
+    var observerGame = box.insert(new Q.UI.Button({ x: 0, y: 10+lunarGame.p.h, fill: "#CCCCCC",
+                                             label: "Poursuite", type: Q.SPRITE_UI },
+                                             function() {
+                                              Q.clearStages();
+                                              Q.panel.show("observer");
+                                              Q.stageScene('observerGame');
+                                             }));
+    box.fit(20);
+  });
+  
+  // Le jeu avec Lunar lander
+  Q.scene("lunarGame",function(stage) {
     LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
     stage.insert(LunarLander);
     
@@ -91,6 +124,7 @@ window.addEventListener("load",function() {
     
     // change le lunar courrant par un lunar à comande manuelle
     Q.input.on('manual', stage, function(e) {
+      Q.panel.hide("valPropres");
       stage.remove(LunarLander);
       LunarLander = new Q.LunarManual({state:LunarLander.state});
       stage.insert(LunarLander);
@@ -98,6 +132,7 @@ window.addEventListener("load",function() {
     
     // change le lunar courrant par un lunar à comande par retour d'état
     Q.input.on('retEtat', stage, function(e) {
+      Q.panel.show("valPropres");
       stage.remove(LunarLander);
       LunarLander = new Q.LunarRetourEtat({state:LunarLander.state});
       stage.insert(LunarLander);
@@ -107,8 +142,14 @@ window.addEventListener("load",function() {
       _fixe(dt);
       Q.stageGameLoop(dt);
     });
+    
+    var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
+      label: "Menu", type: Q.SPRITE_UI },
+      function() {
+      Q.clearStages();
+      Q.stageScene('main_menu');
+    }));
   });
-
 
   // Fin du jeu
   Q.scene('endGame',function(stage) {
@@ -132,7 +173,6 @@ window.addEventListener("load",function() {
     var button = box.insert(new Q.UI.Button({ x: 0, y: 10+label.p.h, fill: "#CCCCCC",
                                              label: "Play Again", type: Q.SPRITE_UI }));
     button.on("click", function() {
-      console.log("click");
       Q.clearStages();
       Q.stageScene('game');
     });
@@ -141,6 +181,6 @@ window.addEventListener("load",function() {
 
   // Initialisation 
   Q.load(["lunar.png", "observer.png"],function() {
-    Q.stageScene("observe");
+    Q.stageScene("main_menu");
   });
 });
