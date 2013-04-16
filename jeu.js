@@ -36,6 +36,9 @@ window.addEventListener("load",function() {
   // ajout du 'e' pour la commande par retours d'état
   Q.input.bindKey(69, "retEtat");
   
+  // ajout du 'r' pour le reset
+  Q.input.bindKey(82, "reset");
+  
   Q.valPropres = $M([[0.33,		1.11,		0.0,	0.0],
                       [0.0,		0.0,		0.33,	1.11]]);
   // Set ValPropres to panel
@@ -98,7 +101,12 @@ window.addEventListener("load",function() {
   
   // Le jeu avec Lunar lander
   Q.scene("lunarGame",function(stage) {
-    LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
+    // Si lunar n'est pas defini alors on le creer par défault en commande manuelle
+    if(!LunarLander)
+      LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
+    else  // Sinon on le reset
+      LunarLander.reset($V([45, 1, 51, -1]));
+    // On ajoute le module lunaire à la scène
     stage.insert(LunarLander);
     
     // Affectation des touches
@@ -118,31 +126,46 @@ window.addEventListener("load",function() {
       LunarLander.right();
     });
     
+    // La touche espace
     Q.input.on('fire', stage, function(e) {
       LunarLander.space();
     });
     
-    // change le lunar courrant par un lunar à comande manuelle
+    // Touche 'm' : Change le lunar courrant par un lunar à comande manuelle
     Q.input.on('manual', stage, function(e) {
+      Q.stage().pause();
       Q.panel.hide("valPropres");
       stage.remove(LunarLander);
       LunarLander = new Q.LunarManual({state:LunarLander.state});
       stage.insert(LunarLander);
+      Q.stage().unpause();
     });
     
-    // change le lunar courrant par un lunar à comande par retour d'état
+    // Touche 'e' : Change le lunar courrant par un lunar à comande par retour d'état
     Q.input.on('retEtat', stage, function(e) {
+      Q.stage().pause();
       Q.panel.show("valPropres");
       stage.remove(LunarLander);
       LunarLander = new Q.LunarRetourEtat({state:LunarLander.state});
       stage.insert(LunarLander);
+      Q.stage().unpause();
     });
     
+    // Touche 'r' : Replace Lunar à son état d'origine
+    Q.input.on('reset', stage, function(e) {
+      Q.stage().pause();
+      LunarLander.reset($V([45, 1, 51, -1]));
+      Q.stage().unpause();
+    });
+    
+    // Boucle de jeu
     Q.gameLoop(function(dt) {
+      // fixe Te
       _fixe(dt);
       Q.stageGameLoop(dt);
     });
     
+    // Bouton permettant le retour au menu
     var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
       label: "Menu", type: Q.SPRITE_UI },
       function() {
@@ -151,8 +174,8 @@ window.addEventListener("load",function() {
     }));
   });
 
-  // Fin du jeu
-  Q.scene('endGame',function(stage) {
+  // Fin du jeu, lorsque Lunar alunit
+  Q.scene('endLunarGame',function(stage) {
     var box = stage.insert(new Q.UI.Container({
       x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
     }));

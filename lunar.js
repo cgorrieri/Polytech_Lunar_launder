@@ -18,17 +18,11 @@ Quintus.LunarLaunder = function(Q) {
       te = this.Te = 0.04;
       // Affichage du Te
       Q.panel.set({"te" : (te*1000).toFixed(0)});
-      // si un état est donné on l'utilise
-      if(p.state)
-        this.state = p.state;
-      else // sinon on initialise à 0
-        this.state = $V([0,0,0,0]);
-      this.mvide = 6839; // masse à  vide (kg)
-      this.mfuel = 816.5;  // masse de carburant (kg) });
-      this.mfuelCons= 0;
-      this.m = this.mvide + this.mfuel; // masse total
+      
       this.ve = 4500; // vitesse d'éjection des gaz (en m/s), ou specific impulse
-      this.erg = this.ve/this.m; // epsilon
+      
+      // initialise les propriété resetable
+      this.reset(p.state);
       // Matrices de calcules
       this.Ad =  $M([[1,te,0,0],
                   [0,1,0,0],
@@ -40,21 +34,33 @@ Quintus.LunarLaunder = function(Q) {
                   [b,0],
                   [0,a],
                   [0,b]]);
-      // vecteurs de vitesses
-      this.ax = this.ay = 0;
-      this.Un = $V([this.ax, this.ay - g/this.erg]);
-      this.tVol = 0; // temps de vol total   
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
       if(this.state.e(3) <= 0) {
         Q.stage().pause();
-        Q.stageScene("endGame",1);
+        Q.stageScene("endLunarGame",1);
       }
 
       this.calc(dt);
-      this._calculFuel();
+      this._calculFuel(dt);
       this._updateState();
+    },
+    reset: function(state) {
+      // si un état est donné on l'utilise
+      if(state)
+        this.state = state;
+      else // sinon on initialise à 0
+        this.state = $V([0,0,0,0]);
+      this.mvide = 6839; // masse à  vide (kg)
+      this.mfuel = 816.5;  // masse de carburant (kg) });
+      this.mfuelCons= 0;
+      this.m = this.mvide + this.mfuel; // masse total
+      this.erg = this.ve/this.m; // epsilon
+      // vecteurs de vitesses
+      this.ax = this.ay = 0;
+      this.Un = $V([this.ax, this.ay - g/this.erg]);
+      this.tVol = 0; // temps de vol total   
     },
     // méthode à modifier qui calcul l'état
     calc: function(dt){},
@@ -81,8 +87,8 @@ Quintus.LunarLaunder = function(Q) {
       });
     },
     // Calcul du fuel
-    _calculFuel : function() {
-      this.mfuelCons = (Math.abs(this.ax) + Math.abs(this.ay))*this.tVol;
+    _calculFuel : function(dt) {
+      this.mfuelCons = (Math.abs(this.ax) + Math.abs(this.ay))*dt;
  					this.mfuel -= this.mfuelCons;
 					if(this.mfuel<0)  
 					{this.mfuel=0;
