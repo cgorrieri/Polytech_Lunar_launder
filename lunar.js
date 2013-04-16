@@ -47,8 +47,10 @@ Quintus.LunarLaunder = function(Q) {
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
-      if(this.state.e(3) <= 0)
-        Q.stageScene("endGame",0, { label: "You crash" });
+      if(this.state.e(3) <= 0) {
+        Q.stage().pause();
+        Q.stageScene("endGame",1);
+      }
 
       this.calc(dt);
       this._calculFuel();
