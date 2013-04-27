@@ -10,6 +10,8 @@ Quintus.LunarLaunder = function(Q) {
         scale:0.7
       });
       
+      this.type;
+      
       // Met le point de référence du lunar en son bas
       this.p.cy = this.p.h;
       // getter des X et Y reels
@@ -69,7 +71,7 @@ Quintus.LunarLaunder = function(Q) {
     down: function() {},
     right: function() {},
     left: function() {},
-    space: function() {},    
+    space: function() {},
     // Place le lunar et affiche son état
     _updateState : function() {
       var X = this.state;
@@ -105,6 +107,7 @@ Quintus.LunarLaunder = function(Q) {
   Q.Lunar.extend("LunarManual",{
     init: function(p) {
       this._super(p, { });
+      this.type="man";
     },
     // fonction appelé à cheque boucle du jeu
     calc: function(dt) {
@@ -134,14 +137,24 @@ Quintus.LunarLaunder = function(Q) {
   });
   
   /*
+   * Consign de la commande par retour d'état
+   */
+  Q.Sprite.extend("Target", {
+    init: function(p) {
+      this._super(p, {asset: "target.png" });
+    }
+  });
+  
+  /*
    * LunarLander en commande par retour d'état
    */
   Q.Lunar.extend("LunarRetourEtat",{
     init: function(p) {
       this._super(p, { });
       this.target = p.target;
-      this.Cn = $V([0, 0, 0, 0]);
-      this.matGluneErg = $V([0, g/this.erg]);
+      this.Cn = $V([p.target.p.x/4, 0, (Q.height - p.target.p.y)/4, 0]);
+      this.matGluneErg = $V([0, 0]);
+      this.type="ret";
     },
     // fonction appelé à cheque boucle du jeu
     calc: function(dt) {
@@ -163,12 +176,16 @@ Quintus.LunarLaunder = function(Q) {
     left: function() {this.addTargetX(-1);},
     space: function() {},
     addTargetX: function(ax) {
-      this.Un = this.Un.add([ax, 0]);
-      this.ax = this.Un.e(1);
+      if(this.Cn.e(1) + ax >= 0) {
+        this.Cn = this.Cn.add([ax, 0, 0, 0]);
+        this.target.p.x = this.Cn.e(1)*4;
+       }
     },
     addTargetY: function(ay) {
-      this.ay += ay;
-      this.Un = $V([this.ax, this.ay - g/this.erg]);
+      if(this.Cn.e(3) + ay >= 0) {
+        this.Cn = this.Cn.add([0, 0, ay, 0]);
+        this.target.p.y = Q.height - this.Cn.e(3)*4;
+      }
     },
   });
   return Q;

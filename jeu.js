@@ -66,15 +66,34 @@ window.addEventListener("load",function() {
   
   // LunarLander
   var LunarLander;
+  // Consigne
+  var Target;
 
   Q.scene("observerGame",function(stage) {
     var mobile = new Q.Mobile({x:0, y:0});
-    stage.insert(new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile}));
+    var observer = new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile});
+    stage.insert(observer);
     stage.insert(mobile);
+    
     Q.gameLoop(function(dt) {
       _fixe(dt);
       Q.stageGameLoop(dt);
     });
+    
+    // Touche 'r' : Replace Lunar à son état d'origine
+    Q.input.on('reset', stage, function(e) {
+      Q.stage().pause();
+      // A faire
+      Q.stage().unpause();
+    });
+    
+    // Bouton permettant le retour au menu
+    var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
+      label: "Menu", type: Q.SPRITE_UI },
+      function() {
+      Q.clearStages();
+      Q.stageScene('main_menu');
+    }));
   });
 
   Q.scene("main_menu",function(stage) {
@@ -86,6 +105,7 @@ window.addEventListener("load",function() {
                                              label: "Loi de commandes", type: Q.SPRITE_UI },
                                              function() {
                                               Q.clearStages();
+                                              Target = new Q.Target({x:0,y:Q.height});
                                               Q.panel.show("state");
                                               Q.stageScene('lunarGame');
                                              }));
@@ -104,8 +124,11 @@ window.addEventListener("load",function() {
     // Si lunar n'est pas defini alors on le creer par défault en commande manuelle
     if(!LunarLander)
       LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
-    else  // Sinon on le reset
+    else  {// Sinon on le reset
       LunarLander.reset($V([45, 1, 51, -1]));
+      if(LunarLander.type=="ret")
+        stage.insert(Target);
+    }
     // On ajoute le module lunaire à la scène
     stage.insert(LunarLander);
     
@@ -135,6 +158,7 @@ window.addEventListener("load",function() {
     Q.input.on('manual', stage, function(e) {
       Q.stage().pause();
       Q.panel.hide("valPropres");
+      stage.remove(Target);
       stage.remove(LunarLander);
       LunarLander = new Q.LunarManual({state:LunarLander.state});
       stage.insert(LunarLander);
@@ -146,7 +170,8 @@ window.addEventListener("load",function() {
       Q.stage().pause();
       Q.panel.show("valPropres");
       stage.remove(LunarLander);
-      LunarLander = new Q.LunarRetourEtat({state:LunarLander.state});
+      stage.insert(Target);
+      LunarLander = new Q.LunarRetourEtat({state:LunarLander.state, target:Target});
       stage.insert(LunarLander);
       Q.stage().unpause();
     });
@@ -169,6 +194,7 @@ window.addEventListener("load",function() {
     var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
       label: "Menu", type: Q.SPRITE_UI },
       function() {
+      
       Q.clearStages();
       Q.stageScene('main_menu');
     }));
@@ -203,7 +229,7 @@ window.addEventListener("load",function() {
   });
 
   // Initialisation 
-  Q.load(["lunar.png", "observer.png"],function() {
+  Q.load(["lunar.png", "observer.png", "target.png"],function() {
     Q.stageScene("main_menu");
   });
 });
