@@ -18,7 +18,7 @@ Quintus.Observeur = function(Q) {
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
-      this.angleRotation += 0.02;
+      this.angleRotation += 0.007;
       this.vx = this.V * Math.cos(this.angleRotation);
       this.vy = this.V * Math.sin(this.angleRotation);
 
