@@ -35,12 +35,17 @@ window.addEventListener("load",function() {
   
   // ajout du 'e' pour la commande par retours d'état
   Q.input.bindKey(69, "retEtat");
+
+  // ajout du 'h' pour la commande optimale
+  Q.input.bindKey(72, "optimal");
   
   // ajout du 'r' pour le reset
   Q.input.bindKey(82, "reset");
   
   Q.valPropres = $M([[0.33,		1.11,		0.0,	0.0],
                       [0.0,		0.0,		0.33,	1.11]]);
+
+  Q.Kn = null;
   // Set ValPropres to panel
   // initialisation du panel
   Q.panel = new Q.PanelState();
@@ -126,7 +131,7 @@ window.addEventListener("load",function() {
       LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
     else  {// Sinon on le reset
       LunarLander.reset($V([45, 1, 51, -1]));
-      if(LunarLander.type=="ret")
+      if(LunarLander.type=="ret" || LunarLander.type=="opt")
         stage.insert(Target);
     }
     // On ajoute le module lunaire à la scène
@@ -158,6 +163,7 @@ window.addEventListener("load",function() {
     Q.input.on('manual', stage, function(e) {
       Q.stage().pause();
       Q.panel.hide("valPropres");
+      Q.panel.hide("commandOptimal");
       stage.remove(Target);
       stage.remove(LunarLander);
       LunarLander = new Q.LunarManual({state:LunarLander.state});
@@ -169,11 +175,25 @@ window.addEventListener("load",function() {
     Q.input.on('retEtat', stage, function(e) {
       Q.stage().pause();
       Q.panel.show("valPropres");
+      Q.panel.hide("commandOptimal");
       stage.remove(LunarLander);
       stage.insert(Target);
       LunarLander = new Q.LunarRetourEtat({state:LunarLander.state, target:Target});
       stage.insert(LunarLander);
       Q.stage().unpause();
+    });
+
+    // Touche 'e' : Change le lunar courrant par un lunar à comande par retour d'état
+    Q.input.on('optimal', stage, function(e) {
+      Q.stage().pause();
+      Q.panel.hide("valPropres");
+      Q.panel.show("commandOptimal");
+      stage.remove(LunarLander);
+      stage.insert(Target);
+      LunarLander = new Q.LunarOptimal({state:LunarLander.state, target:Target});
+      stage.insert(LunarLander);
+      if(Q.Kn != null) // Si les valeurs de la commande optimale sont chargées
+        Q.stage().unpause();
     });
     
     // Touche 'r' : Replace Lunar à son état d'origine

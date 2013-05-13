@@ -39,7 +39,7 @@ Quintus.LunarLaunder = function(Q) {
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
-      if(this.state.e(3) <= 0) {
+      if(this.state.e(3) <= 0.01) {
         Q.stage().pause();
         Q.stageScene("endLunarGame",1);
       }
@@ -62,10 +62,13 @@ Quintus.LunarLaunder = function(Q) {
       // vecteurs de vitesses
       this.ax = this.ay = 0;
       this.Un = $V([this.ax, this.ay - g/this.erg]);
-      this.tVol = 0; // temps de vol total   
+      this.tVol = 0; // temps de vol total
+      this.resetMore();
     },
     // méthode à modifier qui calcul l'état
     calc: function(dt){},
+    // Permet au fille de resetter leurs attributs
+    resetMore: function(){},
     // fonction de control
     up: function() {},
     down: function() {},
@@ -144,31 +147,15 @@ Quintus.LunarLaunder = function(Q) {
       this._super(p, {asset: "target.png" });
     }
   });
-  
+
   /*
-   * LunarLander en commande par retour d'état
+   * LunarLander abstrait ayant une consigne
    */
-  Q.Lunar.extend("LunarRetourEtat",{
+  Q.Lunar.extend("LunarTarget",{
     init: function(p) {
       this._super(p, { });
       this.target = p.target;
       this.Cn = $V([p.target.p.x/4, 0, (Q.height - p.target.p.y)/4, 0]);
-      this.matGluneErg = $V([0, 0]);
-      this.type="ret";
-    },
-    // fonction appelé à cheque boucle du jeu
-    calc: function(dt) {
-      var X=this.state;
-      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
-      
-      // Récuperer axn et ayn
-      axy = Q.valPropres.x(this.Cn.subtract(X));
-      this.ax = axy.e(1);
-      this.ay = axy.e(2);
-      
-      // Calcule du nouveau vecteur d'état
-      //            (   Ad    -   Bd .    K        ) .  Xn     +   Bb   .   K    .   Cn            -      Bd  . (0, Glune/erg)
-      this.state = ((Ad.subtract(Bd.x(Q.valPropres))).x(X)).add(Bd.x(Q.valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
     },
     up: function() {this.addTargetY(1);},
     down: function() {this.addTargetY(-1);},
@@ -186,7 +173,68 @@ Quintus.LunarLaunder = function(Q) {
         this.Cn = this.Cn.add([0, 0, ay, 0]);
         this.target.p.y = Q.height - this.Cn.e(3)*4;
       }
+    }
+  });
+  
+  /*
+   * LunarLander en commande par retour d'état
+   */
+  Q.LunarTarget.extend("LunarRetourEtat",{
+    init: function(p) {
+      this._super(p, { });
+      this.matGluneErg = $V([0, 0]);
+      this.type="ret";
     },
+    // fonction appelé à cheque boucle du jeu
+    calc: function(dt) {
+      var X=this.state;
+      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
+      
+      // Récuperer axn et ayn
+      axy = Q.valPropres.x(this.Cn.subtract(X));
+      this.ax = axy.e(1);
+      this.ay = axy.e(2);
+      
+      // Calcule du nouveau vecteur d'état
+      //            (   Ad    -   Bd .    K        ) .  Xn     +   Bb   .   K    .   Cn            -      Bd  . (0, Glune/erg)
+      this.state = ((Ad.subtract(Bd.x(Q.valPropres))).x(X)).add(Bd.x(Q.valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
+    }
+  });
+
+  /*
+   * LunarLander en commande par retour d'état
+   */
+  Q.LunarTarget.extend("LunarOptimal",{
+    init: function(p) {
+      this._super(p, { });
+      this.type="opt";
+      // indice util le Kn
+      this.currentStep = 0;
+      this.Ch = this.Cn;
+    },
+    resetMore: function() {
+      this.currentStep = 0;
+      this.Ch = this.Cn;
+    },
+    // fonction appelé à cheque boucle du jeu
+    calc: function(dt) {
+      if(this.currentStep < Q.Kn.length) { // Si on n'a pas atteint l'horizon
+        var X=this.state;
+        var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
+
+        var Ki = Q.Kn[this.currentStep];
+        
+        // Récuperer axn et ayn
+        axy = Ki.x(this.Ch.subtract(X));
+        this.ax = axy.e(1);
+        this.ay = axy.e(2);
+        
+        // Calcule du nouveau vecteur d'état
+        //            (   Ad    -  Bd . Ki ) .  Xn   +  Bb.  K   .   Cn        -      Bd  . Un
+        this.state = ((Ad.subtract(Bd.x(Ki))).x(X)).add(Bd.x(Ki).x(this.Ch)).subtract(Bd.x(this.Un));
+        this.currentStep++;
+      }
+    }
   });
   return Q;
 };

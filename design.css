@@ -1,0 +1,44 @@
+h2, h3, p {
+  text-align:center;
+}
+p {
+  margin:2px 0px;
+}
+input {
+  width:50px;
+}
+label {
+  display:inline-block;
+  width:80px;
+  text-align:left;
+}
+
+/* CANVAS */
+#game {
+  border:2px solid black;
+}
+
+/* PANELS */
+#game_container {
+  margin:0px !important;
+}
+#panel, #game {
+  float:left;
+}
+#panel {
+  padding:5px;
+  background-color:#AAAAAA;
+  border:2px solid black;
+}
+#panel > div{
+  display:none;
+}
+
+/* COMMANDE OPTIMAL PANEL */
+#fileLoadResult {
+  font-weight:bold;
+  font-color:red;
+}
+#optimalCommandeFile {
+  width:100%;
+}

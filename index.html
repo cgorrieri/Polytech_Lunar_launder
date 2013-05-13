@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Lunar launder</title>
+    <link rel="stylesheet" type="text/css" href="design.css">
     <!-- library -->
       <!-- Quintus : Jeu -->
     <script src='lib/Quintus/quintus.js'></script>
@@ -22,40 +23,8 @@
     <script src='lunar.js'></script>
     <script src='jeu.js'></script>
     <script src='observeur.js'></script>
-    
-    <style type="text/css" >
-      h2, h3, p {
-        text-align:center;
-      }
-      p {
-        margin:2px 0px;
-      }
-      input {
-        width:50px;
-      }
-      label {
-        display:inline-block;
-        width:80px;
-        text-align:left;
-      }
-      #game_container {
-        margin:0px !important;
-      }
-      #panel, #game {
-        float:left;
-      }
-      #panel {
-        padding:5px;
-        background-color:#AAAAAA;
-        border:2px solid black;
-      }
-      #panel div{
-        display:none;
-      }
-      #game {
-        border:2px solid black;
-      }
-    </style>
+
+    <script src="fileLoad.js"></script>
   </head>
   <body>
     <h1>Lunar Launder</h1>
@@ -80,6 +49,15 @@
         <p><input type="text" id="11"/> <input type="text" id="12"/> <input type="text" id="13"/> <input type="text" id="14"/></p>
         <p><input type="text" id="21"/> <input type="text" id="22"/> <input type="text" id="23"/> <input type="text" id="24"/></p>
         <p><input type="submit" value="ok" onclick="Q.setValPropres();">
+      </div>
+      <div id="commandOptimal">
+        <h2>Comande optimale</h2>
+        <h3>Fichier de commande :</h3>
+        <input type="file" id="optimalCommandeFile" name="file" />
+        <div id="fileLoadResult">Aucun fichier chargé !</div>
+        <script type="text/javascript">
+          document.getElementById('optimalCommandeFile').addEventListener('change', handleFileSelect, false);
+        </script>
       </div>
     </div>
   </body>
