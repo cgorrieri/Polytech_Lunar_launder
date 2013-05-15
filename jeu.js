@@ -58,7 +58,6 @@ window.addEventListener("load",function() {
   }
   
   _fixe = function(dt) {
-      if(dt>= Q.options.frameTimeLimit) return;
       // fixe dt à Te
       lastGameLoopFrame = new Date().getTime()+(dt*1000);
       var now;
@@ -66,6 +65,7 @@ window.addEventListener("load",function() {
         now = new Date().getTime();
         dt = now - Q.lastGameLoopFrame;
       } while(dt < Q.options.frameTimeLimit);
+      if(dt>= Q.options.frameTimeLimit) return Q.options.frameTimeLimit;
       return dt;
     }
   
@@ -76,7 +76,7 @@ window.addEventListener("load",function() {
 
   Q.scene("observerGame",function(stage) {
     var mobile = new Q.Mobile({x:50, y:50});
-    var observer = new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile});
+    var observer = new Q.Observateur({x:15, y:65, angle:Math.PI/2, mobile:mobile});
     stage.insert(observer);
     stage.insert(mobile);
     
