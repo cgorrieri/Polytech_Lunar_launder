@@ -3,12 +3,10 @@ Quintus.Observeur = function(Q) {
   Q.Sprite.extend("Observateur",{
     init: function(p) {
       this._super(p, { asset: "observer.png",
-        x: 0,
-        y: 0,
         scale: 0.5
       });
-      this.X = this.p.x;
-      this.Y = this.p.y;
+      this.X = p.x;
+      this.Y = p.y;
       this.V = 10;
       this.angleRotation = (p.angle ? p.angle : 0);
       this.mobile = p.mobile;
@@ -21,7 +19,7 @@ Quintus.Observeur = function(Q) {
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
-      this.angleRotation += 0.007;
+      this.angleRotation -= 0.005;
       this.vx = this.V * Math.cos(this.angleRotation);
       this.vy = this.V * Math.sin(this.angleRotation);
 
@@ -31,7 +29,8 @@ Quintus.Observeur = function(Q) {
       
       this.p.x = this.X * 4;
       this.p.y = Q.height - this.Y*4;
-	  
+      
+      // Point A(x,y), atan2(x,y) retourn l'angle entre l'axe X et la droite (origin,A)
       this.teta.push({x:this.X, y:this.Y,
         angle:(Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)))});
 		
@@ -155,11 +154,10 @@ Quintus.Observeur = function(Q) {
   Q.Sprite.extend("Mobile",{
     init: function(p) {
       this._super(p, { asset: "observer.png",
-        x: 45,
-        y: 51,
         scale:0.25
       });
-      this.X = this.Y = 0;
+      this.X = p.x;
+      this.Y = p.y;
       this.vx = 5;
       this.vy = 5;
       // fonction appelé à cheque boucle du jeu

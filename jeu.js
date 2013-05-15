@@ -75,7 +75,7 @@ window.addEventListener("load",function() {
   var Target;
 
   Q.scene("observerGame",function(stage) {
-    var mobile = new Q.Mobile({x:0, y:0});
+    var mobile = new Q.Mobile({x:50, y:50});
     var observer = new Q.Observateur({x:15, y:15, angle:3*Math.PI/4, mobile:mobile});
     stage.insert(observer);
     stage.insert(mobile);
