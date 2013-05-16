@@ -30,36 +30,43 @@ window.addEventListener("load",function() {
     frameTimeLimit: 40
   };
   
-  // ajout du 'm' pour la commande manuelle
+  // Initialisation du panel
+  Q.panel = new Q.PanelState();
+  
+  // TOUCHE CLAVIER
+  // 'm' pour la commande manuelle
   Q.input.bindKey(77, "manual");
-  
-  // ajout du 'e' pour la commande par retours d'état
+  // 'e' pour la commande par retours d'état
   Q.input.bindKey(69, "retEtat");
-
-  // ajout du 'h' pour la commande optimale
+  // 'h' pour la commande optimale
   Q.input.bindKey(72, "optimal");
-  
-  // ajout du 'r' pour le reset
+  // 'r' pour le reset
   Q.input.bindKey(82, "reset");
   
+  // Valeurs propres pour la commande par retour d'état
   Q.valPropres = $M([[0.33,		1.11,		0.0,	0.0],
                       [0.0,		0.0,		0.33,	1.11]]);
-  
-  Q.Te = 0.04;
-  Q.ScalePM = 4;
-
-  Q.Kn = null;
-  // Set ValPropres to panel
-  // initialisation du panel
-  Q.panel = new Q.PanelState();
+  // Affichage de la matrice
   Q.panel.set({"11":0.33,	"12":1.11,"13":0.0,	"14":0.0,
                "21":0.0,	"22":0.0,	"23":0.33,"24":1.11})
-               
+  // Recupere les nouvelles valeurs propres dans le panel
   Q.setValPropres = function() {
     Q.valPropres = $M([[parseFloat(Q.panel.get("11")),parseFloat(Q.panel.get("12")),parseFloat(Q.panel.get("13")),parseFloat(Q.panel.get("14"))],
                       [parseFloat(Q.panel.get("21")),parseFloat(Q.panel.get("22")),parseFloat(Q.panel.get("23")),parseFloat(Q.panel.get("24"))]]);
   }
   
+  // Tableau des valeurs propres pour la commande optimale
+  Q.Kn = null;
+  
+  // Temps d'échantillonnage
+  Q.Te = 0.04;
+  // Affichage du Te
+  Q.panel.set({"te" : (te*1000).toFixed(0)});
+  
+  // Echel d'afichage et px/metre
+  Q.ScalePM = 4;
+  
+  // Permet de fixer dt à Te pour avoir un temps cohérent
   _fixe = function(dt) {
       // fixe dt à Te
       lastGameLoopFrame = new Date().getTime()+(dt*1000);
@@ -76,23 +83,50 @@ window.addEventListener("load",function() {
   var LunarLander;
   // Consigne
   var Target;
-
+  
+  Q.XtoPx = function(x) {return x * Q.ScalePM;}
+  Q.YtoPy = function(x) {return Q.height - y * Q.ScalePM;}
+  
+  // Menu principale
+  Q.scene("main_menu",function(stage) {
+    var box = stage.insert(new Q.UI.Container({
+      x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
+    }));
+    // Lance la simulation de Lunar Lander
+    var lunarGame = box.insert(
+      new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
+        label: "Loi de commandes", type: Q.SPRITE_UI },
+        function() {
+        Q.clearStages();
+        Target = new Q.Target({x:0,y:0, asset:"target.png"});
+        Q.panel.show("state");
+        Q.stageScene('lunarGame');
+        }));
+    // Lance l'observation du mobile
+    var observerGame = box.insert(
+      new Q.UI.Button({ x: 0, y: 10+lunarGame.p.h, fill: "#CCCCCC",
+        label: "Poursuite", type: Q.SPRITE_UI },
+        function() {
+        Q.clearStages();
+        Q.panel.show("observer");
+        Q.stageScene('observerGame');
+        }));
+    box.fit(20);
+  });
+  
+  // Observation de la trajectoire d'un mobile
   Q.scene("observerGame",function(stage) {
+    // Initialisation du mobile
     var mobile = new Q.Mobile({x:50, y:50, asset:"observer.png", scale:0.2});
+    stage.insert(mobile);
+    // Initialisation de l'observeur
     var observer = new Q.Observateur({x:15, y:65, angle:Math.PI/2, mobile:mobile});
     stage.insert(observer);
-    stage.insert(mobile);
     
+    // boocle de jeu
     Q.gameLoop(function(dt) {
       _fixe(dt);
       Q.stageGameLoop(dt);
-    });
-    
-    // Touche 'r' : Replace Lunar à son état d'origine
-    Q.input.on('reset', stage, function(e) {
-      Q.stage().pause();
-      // A faire
-      Q.stage().unpause();
     });
     
     // Bouton permettant le retour au menu
@@ -103,32 +137,8 @@ window.addEventListener("load",function() {
       Q.stageScene('main_menu');
     }));
   });
-
-  Q.scene("main_menu",function(stage) {
-    var box = stage.insert(new Q.UI.Container({
-      x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
-    }));
-    
-    var lunarGame = box.insert(
-      new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
-             label: "Loi de commandes", type: Q.SPRITE_UI },
-             function() {
-              Q.clearStages();
-              Target = new Q.Target({x:0,y:0, asset:"target.png"});
-              Q.panel.show("state");
-              Q.stageScene('lunarGame');
-             }));
-    var observerGame = box.insert(new Q.UI.Button({ x: 0, y: 10+lunarGame.p.h, fill: "#CCCCCC",
-                                             label: "Poursuite", type: Q.SPRITE_UI },
-                                             function() {
-                                              Q.clearStages();
-                                              Q.panel.show("observer");
-                                              Q.stageScene('observerGame');
-                                             }));
-    box.fit(20);
-  });
   
-  // Le jeu avec Lunar lander
+  // Simulation Lunar lander
   Q.scene("lunarGame",function(stage) {
     // Si lunar n'est pas defini alors on le creer par défault en commande manuelle
     if(!LunarLander)
@@ -145,19 +155,15 @@ window.addEventListener("load",function() {
     Q.input.on('up', stage, function(e) {
       LunarLander.up();
     });
-    
     Q.input.on('down', stage, function(e) {
       LunarLander.down();
     });
-    
     Q.input.on('left', stage, function(e) {
       LunarLander.left();
     });
-    
     Q.input.on('right', stage, function(e) {
       LunarLander.right();
     });
-    
     // La touche espace
     Q.input.on('fire', stage, function(e) {
       LunarLander.space();
@@ -187,7 +193,7 @@ window.addEventListener("load",function() {
       Q.stage().unpause();
     });
 
-    // Touche 'e' : Change le lunar courrant par un lunar à comande par retour d'état
+    // Touche 'h' : Change le lunar courrant par un lunar à comande optimale
     Q.input.on('optimal', stage, function(e) {
       Q.stage().pause();
       Q.panel.hide("valPropres");
@@ -196,11 +202,11 @@ window.addEventListener("load",function() {
       stage.insert(Target);
       LunarLander = new Q.LunarOptimal({state:LunarLander.state, target:Target});
       stage.insert(LunarLander);
-      if(Q.Kn != null) // Si les valeurs de la commande optimale sont chargées
+      if(Q.Kn != null) // Si les valeurs de la commande optimale sont chargées alors on continue
         Q.stage().unpause();
     });
     
-    // Touche 'r' : Replace Lunar à son état d'origine
+    // Touche 'r' : Replace le Lunar à son état d'origine
     Q.input.on('reset', stage, function(e) {
       Q.stage().pause();
       LunarLander.reset($V([45, 1, 51, -1]));
@@ -218,10 +224,9 @@ window.addEventListener("load",function() {
     var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
       label: "Menu", type: Q.SPRITE_UI },
       function() {
-      
-      Q.clearStages();
-      Q.stageScene('main_menu');
-    }));
+        Q.clearStages();
+        Q.stageScene('main_menu');}
+    ));
   });
 
   // Fin du jeu, lorsque Lunar alunit
@@ -243,17 +248,19 @@ window.addEventListener("load",function() {
            
     var label = box.insert(new Q.UI.Text({x:10, y: 0, 
                                           label: text_alunissage+"\nVitesse d'impact: "+vitImpact+"m/s" }));
-    var button = box.insert(new Q.UI.Button({ x: 0, y: 10+label.p.h, fill: "#CCCCCC",
+    var playAgain = box.insert(new Q.UI.Button({ x: 0, y: 10+label.p.h, fill: "#CCCCCC",
                                              label: "Play Again", type: Q.SPRITE_UI }));
-    button.on("click", function() {
+    playAgain.on("click", function() {
       Q.clearStages();
       Q.stageScene('lunarGame');
     });
     box.fit(20);
   });
 
-  // Initialisation 
+  // Initialisation
+  // Chargement des images
   Q.load(["lunar.png", "observer.png", "target.png"],function() {
+    // Lancement du menu principale
     Q.stageScene("main_menu");
   });
 });

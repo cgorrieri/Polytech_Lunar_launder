@@ -18,24 +18,30 @@
     <script src='lib/Sylvester/sylvester.js'></script>
     <script src='lib/Sylvester/matrix.js'></script>
     <script src='lib/Sylvester/vector.js'></script>
-    <!-- Game -->
+    <!-- Objets de simulation -->
     <script src='panel.js'></script>
     <script src='lunar.js'></script>
     <script src='jeu.js'></script>
     <script src='observeur.js'></script>
 
+    <!-- Gère le chargement d'un fichier pour la commande optimale -->
     <script src="fileLoad.js"></script>
-    
-    <script type="text/javascript">
-
-    </script>
   </head>
   <body>
     <h1>Lunar Launder</h1>
     <canvas id="game" width='650' height='600'></canvas>
     <div id="panel">
       <div id="observer">
-        <p><input type="submit" value="Lancer" onclick="alert('A FAIRE');">
+        <h3>Etat reel du mobile</h3>
+        <p><label>x (m)</label><input type="text" id="reel_mobile_x_value"/></p>
+        <p><label>vx (m/s)</label><input type="text" id="reel_mobile_x_speed"/></p>
+        <p><label>y (m)</label><input type="text" id="reel_mobile_y_value"/></p>
+        <p><label>vy (m/s)</label><input type="text" id="reel_mobile_y_speed"/></p>
+        <h3>Etat calculé du mobile</h3>
+        <p><label>x (m)</label><input type="text" id="calc_mobile_x_value"/></p>
+        <p><label>vx (m/s)</label><input type="text" id="calc_mobile_x_speed"/></p>
+        <p><label>y (m)</label><input type="text" id="calc_mobile_y_value"/></p>
+        <p><label>vy (m/s)</label><input type="text" id="calc_mobile_y_speed"/></p>
       </div>
       <div id="state">
         <h2>Control</h2>

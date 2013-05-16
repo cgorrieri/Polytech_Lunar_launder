@@ -1,10 +1,11 @@
 Quintus.Observeur = function(Q) {
-  var Te = 0.04; // en secondes
   var Vmobile = 2; // en m/s
+  
   // Observateur qui va definir la trajectoire du Mobile
   Q.Sprite.extend("Observateur",{
     init: function(p) {
-      this._super(p, { asset: "observer.png",
+      this._super(p, { 
+        asset: "observer.png", // image
         scale: 0.5
       });
       this.X = p.x;

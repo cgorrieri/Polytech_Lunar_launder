@@ -7,18 +7,17 @@ Quintus.LunarPanel = function(Q) {
       this.listeners = {};
     },
 
-    // Resets the state to value p
+    // Remet à zero toutes les valeurs des champs
     reset: function(p) { this.init(p); },
     
-    // Internal helper method to set an individual property
+    // Définit la valeur d'un champs
     _setProperty: function(value,key) {
       if(!this.dom.hasOwnProperty(key))
         this.dom[key] = document.getElementById(key);
       this.dom[key].value = value;
     },
 
-    // Set one or more properties, trigger events on those
-    // properties changing
+    // Definit la valeur de un ou plusieurs champs
     set: function(properties,value) {
       if(Q._isObject(properties)) {
         Q._each(properties,this._setProperty,this);
@@ -27,17 +26,17 @@ Quintus.LunarPanel = function(Q) {
       }
     },
 
-    // Return an individual property
+    // Retourne la valeur du champ avec l'id property
     get: function(property) {
       return this.dom[property].value;
     },
     
-    // hide a group in the panel
+    // Cache un sous panel
     hide: function(group_id) {
       document.getElementById(group_id).style.display="none";
     },
     
-    // show a group in the panel
+    // Affiche un sous panel
     show: function(group_id) {
       document.getElementById(group_id).style.display="block";
     }

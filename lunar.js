@@ -14,25 +14,21 @@ Quintus.LunarLaunder = function(Q) {
       
       // Met le point de référence du lunar en son bas
       this.p.cy = this.p.h;
-      // getter des X et Y reels
+      // Coordonnée mathématique
       this.X = p.x;
       this.Y = p.y;
-      // Fixation du Te
-      te = this.Te = 0.04;
-      // Affichage du Te
-      Q.panel.set({"te" : (te*1000).toFixed(0)});
       
       this.ve = 4500; // vitesse d'éjection des gaz (en m/s), ou specific impulse
       
       // initialise les propriété resetable
       this.reset(p.state);
       // Matrices de calcules
-      this.Ad =  $M([[1,te,0,0],
+      this.Ad =  $M([[1,Q.Te,0,0],
                   [0,1,0,0],
-                  [0,0,1,te],
+                  [0,0,1,Q.Te],
                   [0,0,0,1]]);
-      a = this.erg*(te*te)/2;
-      b = this.erg*te;
+      a = this.erg*(Q.Te*Q.Te)/2;
+      b = this.erg*Q.Te;
       this.Bd = $M([[a,0],
                   [b,0],
                   [0,a],
@@ -44,7 +40,6 @@ Quintus.LunarLaunder = function(Q) {
         Q.stage().pause();
         Q.stageScene("endLunarGame",1);
       }
-
       this.calc(dt);
       this._calculFuel(dt);
       this._updateState();
@@ -79,10 +74,10 @@ Quintus.LunarLaunder = function(Q) {
     // Place le lunar et affiche son état
     _updateState : function() {
       var X = this.state;
-      // place lunar par rapport au repère en bas à gauche
-      // on definit ici une échelle de 4px pour un metre
-      this.p.x = (this.X = X.e(1)) * 4;
-      this.p.y = Q.height - (this.Y = X.e(3))*4;
+      // mise à jour de la position du Lunar
+      this.p.x = Q.XtoPx(this.X = X.e(1));
+      this.p.y = Q.YtoPy(this.Y = X.e(3));
+      // Affichage des valeurs
       Q.panel.set({
        "temps":(this.tVol+=this.Te).toFixed(1),
              "x_value": X.e(1).toFixed(2),
@@ -95,14 +90,15 @@ Quintus.LunarLaunder = function(Q) {
     // Calcul du fuel
     _calculFuel : function(dt) {
       this.mfuelCons = (Math.abs(this.ax) + Math.abs(this.ay))*dt;
- 					this.mfuel -= this.mfuelCons;
-					if(this.mfuel<0)  
-					{this.mfuel=0;
-					this.ax=0;
-					this.ay=0;}  
-					else{this.mfuel -= this.mfuelCons;}  
+      this.mfuel -= this.mfuelCons;
+      if(this.mfuel<0) {
+        his.mfuel=0;
+        this.ax=0;
+        this.ay=0;
+      } else {
+        this.mfuel -= this.mfuelCons;
+      }  
     }
-
   });
   
   /*
@@ -113,7 +109,6 @@ Quintus.LunarLaunder = function(Q) {
       this._super(p, { });
       this.type="man";
     },
-    // fonction appelé à cheque boucle du jeu
     calc: function(dt) {
       var X=this.state;
       var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
@@ -121,6 +116,7 @@ Quintus.LunarLaunder = function(Q) {
       // Calcule du nouveau vecteur d'état
       this.state = (Ad.x(X)).add(Bd.x(this.Un));
     },
+    // definition des methodes de controle
     up: function() {this.addAy(1);},
     down: function() {this.addAy(-1);},
     right: function() {this.addAx(1);},
@@ -144,7 +140,6 @@ Quintus.LunarLaunder = function(Q) {
   Q.Sprite.extend("Target",{
     init: function(p) {
       this._super(p, {});
-      
       // position mathématique
       this.X = p.x;
       this.Y = p.y;
@@ -153,11 +148,12 @@ Quintus.LunarLaunder = function(Q) {
       this.vy = (p.vy ? p.vy : 0);
     },
     step: function(dt) {
+      // x(t+1) = x(t) + vx(t)*dt
       this.X += this.vx * Q.Te;
       this.Y += this.vy * Q.Te;
       
-      this.p.x = this.X * Q.ScalePM;
-      this.p.y = Q.height - this.Y* Q.ScalePM;
+      this.p.x = Q.XtoPx(this.X);
+      this.p.y = Q.YtoPy(this.Y);
     }
   });
 
@@ -167,9 +163,12 @@ Quintus.LunarLaunder = function(Q) {
   Q.Lunar.extend("LunarTarget",{
     init: function(p) {
       this._super(p, { });
+      // Objet à atteindre
       this.target = p.target;
+      // Vecteur de consigne
       this.Cn = $V([p.target.X, p.target.vx, p.target.Y, p.target.vy]);
     },
+    // methode de controle de la consigne
     up: function() {this.addTargetY(1);},
     down: function() {this.addTargetY(-1);},
     right: function() {this.addTargetX(1);},
@@ -197,15 +196,18 @@ Quintus.LunarLaunder = function(Q) {
       this._super(p, { });
       this.matGluneErg = $V([0, 0]);
       this.type="ret";
+      
+      // Déplacememnt de la consigne à chaque instant
+      this.AddCn = [this.Cn.e(2)*Q.Te, 0, this.Cn.e(4)*Q.Te, 0];
     },
-    // fonction appelé à cheque boucle du jeu
     calc: function(dt) {
       var X=this.state;
       var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
       
-      // Récuperer axn et ayn
-      this.Cn = this.Cn.add([this.Cn.e(2)*Q.Te, 0, this.Cn.e(4)*Q.Te, 0]);
+      // Evolution de la consigne par rapport à sa vitesse
+      this.Cn = this.Cn.add(this.AddCn);
       
+      // Récuperer axn et ayn
       axy = Q.valPropres.x(this.Cn.subtract(X));
       this.ax = axy.e(1);
       this.ay = axy.e(2);
@@ -213,8 +215,6 @@ Quintus.LunarLaunder = function(Q) {
       // Calcule du nouveau vecteur d'état
       //            (   Ad    -   Bd .    K        ) .  Xn     +   Bb   .   K    .   Cn            -      Bd  . (0, Glune/erg)
       this.state = ((Ad.subtract(Bd.x(Q.valPropres))).x(X)).add(Bd.x(Q.valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
-    },
-    updateCi : function() {
     }
   });
 
@@ -225,7 +225,7 @@ Quintus.LunarLaunder = function(Q) {
     init: function(p) {
       this._super(p, { });
       this.type="opt";
-      // indice util le Kn
+      // Indice sur le tableau Kn
       this.currentStep = 0;
       this.Ch = this.Cn;
     },
@@ -238,7 +238,7 @@ Quintus.LunarLaunder = function(Q) {
       if(this.currentStep < Q.Kn.length) { // Si on n'a pas atteint l'horizon
         var X=this.state;
         var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
-
+        // récupération des valeurs propres pour l'instant i
         var Ki = Q.Kn[this.currentStep];
         
         // Récuperer axn et ayn
