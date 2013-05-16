@@ -42,9 +42,19 @@ Quintus.Observeur = function(Q) {
         this.currMesure++;
       } else if(this.currMesure == this.nbMesures) { // sinon on calcul grace au gradients conjugués
         this.trajectoireMobile = this.calculeInfoMobile();
+        Q.panel.show("commandOptimal");
+        console.log(this.trajectoireMobile);
+        nbTe = 100;
+        
+        mobileDest = new Q.Target({x:this.trajectoireMobile[0]+this.trajectoireMobile[1]*this.nbMesures*Te, vx:this.trajectoireMobile[1],
+                y: this.trajectoireMobile[2] + this.trajectoireMobile[3]*this.nbMesures*Te, vy:this.trajectoireMobile[3]});
         
         // calculer consigne et envoyer module lunaire
+        //Q.stage().pause();
+        Q.stage().insert(new Q.LunarRetourEtat({scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest}))
         
+        //if(Q.Kn != null) // Si les valeurs de la commande optimale sont chargées
+        //Q.stage().unpause();
         this.currMesure++;
       }
     },
@@ -88,44 +98,31 @@ Quintus.Observeur = function(Q) {
         b = b.add(ci[i].x(y[i]));
       }
       
-      //* resolution par système d'équation
+      // resolution par système d'équation
       var ga = gamma;
       var equations = ga.augment(b);
       console.log("equation");
       var eqns = equations.toRightTriangular();
       
       var sol_vy = eqns.e(4,5) / eqns.e(4,4);
-      var sol_vx =(eqns.e(3,5) - eqns.e(3,4)*sol_vy) / eqns.e(3,3);
-      var sol_y = (eqns.e(2,5) - eqns.e(2,4)*sol_vy - eqns.e(2,3)*sol_vx) / eqns.e(2,2);
-      var sol_x = (eqns.e(1,5) - eqns.e(1,4)*sol_vy - eqns.e(1,3)*sol_vx - eqns.e(1,2)*sol_y) / eqns.e(1,1);
+      var sol_y =(eqns.e(3,5) - eqns.e(3,4)*sol_vy) / eqns.e(3,3);
+      var sol_vx = (eqns.e(2,5) - eqns.e(2,4)*sol_vy - eqns.e(2,3)*sol_y) / eqns.e(2,2);
+      var sol_x = (eqns.e(1,5) - eqns.e(1,4)*sol_vy - eqns.e(1,3)*sol_y - eqns.e(1,2)*sol_vx) / eqns.e(1,1);
       
-      var res = [sol_x, sol_y, sol_vx, sol_vy];
-      console.log(res);
-      //*/
+      var res = [-sol_x, -sol_vx, -sol_y, sol_vy];
+      //console.log(res);
       
       return res;
     }
   });
 
   // Mobile suivant une trajectoire linéaire
-  Q.Sprite.extend("Mobile",{
+  Q.Target.extend("Mobile",{
     init: function(p) {
-      this._super(p, { asset: "observer.png",
-        scale:0.25
-      });
-      this.X = p.x;
-      this.Y = p.y;
-      // vitesse en m/s
-      this.vx = Vmobile;
-      this.vy = Vmobile;
-    },
-    step: function(dt) {
-      this.X += this.vx * Te;
-      
-      this.Y += this.vy * Te;
-      
-      this.p.x = this.X * 4;
-      this.p.y = Q.height - this.Y*4;
+      this._super(p, {scale:0.25});
+      this.vx = this.vy = Vmobile;
+      // Met le point de référence du lunar en son haut au centre
+      this.p.cx = this.p.w/2;
     }
   });
   return Q;

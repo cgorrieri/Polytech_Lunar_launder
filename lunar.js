@@ -15,7 +15,8 @@ Quintus.LunarLaunder = function(Q) {
       // Met le point de référence du lunar en son bas
       this.p.cy = this.p.h;
       // getter des X et Y reels
-      this.X = this.Y = 0;
+      this.X = p.x;
+      this.Y = p.y;
       // Fixation du Te
       te = this.Te = 0.04;
       // Affichage du Te
@@ -139,12 +140,24 @@ Quintus.LunarLaunder = function(Q) {
     },
   });
   
-  /*
-   * Consign de la commande par retour d'état
-   */
-  Q.Sprite.extend("Target", {
+  // Mobile suivant une trajectoire linéaire
+  Q.Sprite.extend("Target",{
     init: function(p) {
-      this._super(p, {asset: "target.png" });
+      this._super(p, {});
+      
+      // position mathématique
+      this.X = p.x;
+      this.Y = p.y;
+      // vitesse en m/s
+      this.vx = (p.vx ? p.vx : 0);
+      this.vy = (p.vy ? p.vy : 0);
+    },
+    step: function(dt) {
+      this.X += this.vx * Q.Te;
+      this.Y += this.vy * Q.Te;
+      
+      this.p.x = this.X * Q.ScalePM;
+      this.p.y = Q.height - this.Y* Q.ScalePM;
     }
   });
 
@@ -155,7 +168,7 @@ Quintus.LunarLaunder = function(Q) {
     init: function(p) {
       this._super(p, { });
       this.target = p.target;
-      this.Cn = $V([p.target.p.x/4, 0, (Q.height - p.target.p.y)/4, 0]);
+      this.Cn = $V([p.target.X, p.target.vx, p.target.Y, p.target.vy]);
     },
     up: function() {this.addTargetY(1);},
     down: function() {this.addTargetY(-1);},
@@ -165,13 +178,13 @@ Quintus.LunarLaunder = function(Q) {
     addTargetX: function(ax) {
       if(this.Cn.e(1) + ax >= 0) {
         this.Cn = this.Cn.add([ax, 0, 0, 0]);
-        this.target.p.x = this.Cn.e(1)*4;
+        this.target.X = this.Cn.e(1);
        }
     },
     addTargetY: function(ay) {
       if(this.Cn.e(3) + ay >= 0) {
         this.Cn = this.Cn.add([0, 0, ay, 0]);
-        this.target.p.y = Q.height - this.Cn.e(3)*4;
+        this.target.Y = this.Cn.e(3);
       }
     }
   });
@@ -191,6 +204,8 @@ Quintus.LunarLaunder = function(Q) {
       var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
       
       // Récuperer axn et ayn
+      this.Cn = this.Cn.add([this.Cn.e(2)*Q.Te, 0, this.Cn.e(4)*Q.Te, 0]);
+      
       axy = Q.valPropres.x(this.Cn.subtract(X));
       this.ax = axy.e(1);
       this.ay = axy.e(2);
@@ -198,6 +213,8 @@ Quintus.LunarLaunder = function(Q) {
       // Calcule du nouveau vecteur d'état
       //            (   Ad    -   Bd .    K        ) .  Xn     +   Bb   .   K    .   Cn            -      Bd  . (0, Glune/erg)
       this.state = ((Ad.subtract(Bd.x(Q.valPropres))).x(X)).add(Bd.x(Q.valPropres).x(this.Cn)).subtract(Bd.x(this.matGluneErg));
+    },
+    updateCi : function() {
     }
   });
 

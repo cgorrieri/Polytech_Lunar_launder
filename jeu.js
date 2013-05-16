@@ -44,6 +44,9 @@ window.addEventListener("load",function() {
   
   Q.valPropres = $M([[0.33,		1.11,		0.0,	0.0],
                       [0.0,		0.0,		0.33,	1.11]]);
+  
+  Q.Te = 0.04;
+  Q.ScalePM = 4;
 
   Q.Kn = null;
   // Set ValPropres to panel
@@ -75,7 +78,7 @@ window.addEventListener("load",function() {
   var Target;
 
   Q.scene("observerGame",function(stage) {
-    var mobile = new Q.Mobile({x:50, y:50});
+    var mobile = new Q.Mobile({x:50, y:50, asset:"observer.png", scale:0.2});
     var observer = new Q.Observateur({x:15, y:65, angle:Math.PI/2, mobile:mobile});
     stage.insert(observer);
     stage.insert(mobile);
@@ -106,14 +109,15 @@ window.addEventListener("load",function() {
       x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
     }));
     
-    var lunarGame = box.insert(new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
-                                             label: "Loi de commandes", type: Q.SPRITE_UI },
-                                             function() {
-                                              Q.clearStages();
-                                              Target = new Q.Target({x:0,y:Q.height});
-                                              Q.panel.show("state");
-                                              Q.stageScene('lunarGame');
-                                             }));
+    var lunarGame = box.insert(
+      new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
+             label: "Loi de commandes", type: Q.SPRITE_UI },
+             function() {
+              Q.clearStages();
+              Target = new Q.Target({x:0,y:0, asset:"target.png"});
+              Q.panel.show("state");
+              Q.stageScene('lunarGame');
+             }));
     var observerGame = box.insert(new Q.UI.Button({ x: 0, y: 10+lunarGame.p.h, fill: "#CCCCCC",
                                              label: "Poursuite", type: Q.SPRITE_UI },
                                              function() {
