@@ -1,6 +1,6 @@
 Quintus.Observeur = function(Q) {
   var Vmobile = 2; // en m/s
-  
+
   // Observateur qui va definir la trajectoire du Mobile
   Q.Sprite.extend("Observateur",{
     init: function(p) {
@@ -19,7 +19,6 @@ Quintus.Observeur = function(Q) {
       this.ci = new Array();
       this.nbMesures = 25;
       this.currMesure = 0;
-      this.trajectoireMobile;
     },
     // fonction appelé à cheque boucle du jeu
     step: function(dt) {
@@ -30,32 +29,31 @@ Quintus.Observeur = function(Q) {
         this.vy = this.V * Math.sin(this.angleRotation);
 
         // Position mathématique
-        this.X += (this.vx+this.vxSuivre) * Te;
-        this.Y += (this.vy+this.vySuivre) * Te;
+        this.X += (this.vx+this.vxSuivre) * Q.Te;
+        this.Y += (this.vy+this.vySuivre) * Q.Te;
         // Position à l'affichage
-        this.p.x = this.X * 4;
-        this.p.y = Q.height - this.Y*4;
+        this.p.x = Q.XtoPx(this.X);
+        this.p.y = Q.YtoPy(this.Y);
         
         // Point A(x,y), atan2(x,y) retourn l'angle entre l'axe X et la droite (origin,A)
-        this.teta.push({x:this.X, y:this.Y, t:Te*this.currMesure,
+        this.teta.push({x:this.X, y:this.Y, t:Q.Te*this.currMesure,
           angle:Math.PI/2 - (Math.atan2((this.mobile.Y - this.Y), (this.mobile.X - this.X)))});
           
         this.currMesure++;
       } else if(this.currMesure == this.nbMesures) { // sinon on calcul grace au gradients conjugués
-        this.trajectoireMobile = this.calculeInfoMobile();
-        Q.panel.show("commandOptimal");
-        console.log(this.trajectoireMobile);
-        nbTe = 100;
+        infoMobile = this.calculeInfoMobile();
+        // Affichage des infos sur le mobile calculé
+        Q.panel.set({"calc_mobile_x_value":infoMobile[0],	"calc_mobile_x_speed":infoMobile[1],
+               "calc_mobile_y_value":infoMobile[2],	"calc_mobile_y_speed":infoMobile[3]});
         
-        mobileDest = new Q.Target({x:this.trajectoireMobile[0]+this.trajectoireMobile[1]*this.nbMesures*Te, vx:this.trajectoireMobile[1],
-                y: this.trajectoireMobile[2] + this.trajectoireMobile[3]*this.nbMesures*Te, vy:this.trajectoireMobile[3]});
+        // Consigne
+        mobileDest = new Q.Target({x:infoMobile[0]+infoMobile[1]*this.nbMesures*Q.Te, vx:infoMobile[1],
+                y: infoMobile[2] + infoMobile[3]*this.nbMesures*Q.Te, vy:infoMobile[3]});
         
-        // calculer consigne et envoyer module lunaire
-        //Q.stage().pause();
+        // On ajoute notre lunar au jeu
         Q.stage().insert(new Q.LunarRetourEtat({scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest}))
         
-        //if(Q.Kn != null) // Si les valeurs de la commande optimale sont chargées
-        //Q.stage().unpause();
+        // On incrémente pour ne plus rentrer dans les calculs
         this.currMesure++;
       }
     },

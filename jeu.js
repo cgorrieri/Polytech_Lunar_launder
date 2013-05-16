@@ -48,7 +48,7 @@ window.addEventListener("load",function() {
                       [0.0,		0.0,		0.33,	1.11]]);
   // Affichage de la matrice
   Q.panel.set({"11":0.33,	"12":1.11,"13":0.0,	"14":0.0,
-               "21":0.0,	"22":0.0,	"23":0.33,"24":1.11})
+               "21":0.0,	"22":0.0,	"23":0.33,"24":1.11});
   // Recupere les nouvelles valeurs propres dans le panel
   Q.setValPropres = function() {
     Q.valPropres = $M([[parseFloat(Q.panel.get("11")),parseFloat(Q.panel.get("12")),parseFloat(Q.panel.get("13")),parseFloat(Q.panel.get("14"))],
@@ -85,7 +85,7 @@ window.addEventListener("load",function() {
   var Target;
   
   Q.XtoPx = function(x) {return x * Q.ScalePM;}
-  Q.YtoPy = function(x) {return Q.height - y * Q.ScalePM;}
+  Q.YtoPy = function(y) {return Q.height - y * Q.ScalePM;}
   
   // Menu principale
   Q.scene("main_menu",function(stage) {
@@ -119,6 +119,9 @@ window.addEventListener("load",function() {
     // Initialisation du mobile
     var mobile = new Q.Mobile({x:50, y:50, asset:"observer.png", scale:0.2});
     stage.insert(mobile);
+    // Affichage de l'état initial du mobile
+    Q.panel.set({"reel_mobile_x_value":50,	"reel_mobile_x_speed":5,
+               "reel_mobile_y_value":50,	"reel_mobile_y_speed":2});
     // Initialisation de l'observeur
     var observer = new Q.Observateur({x:15, y:65, angle:Math.PI/2, mobile:mobile});
     stage.insert(observer);
@@ -127,6 +130,7 @@ window.addEventListener("load",function() {
     Q.gameLoop(function(dt) {
       _fixe(dt);
       Q.stageGameLoop(dt);
+      Q.panel.set({"temps":(this.tVol+=Q.Te).toFixed(1)});
     });
     
     // Bouton permettant le retour au menu
@@ -218,6 +222,7 @@ window.addEventListener("load",function() {
       // fixe Te
       _fixe(dt);
       Q.stageGameLoop(dt);
+      Q.panel.set({"temps":(this.tVol+=Q.Te).toFixed(1)});
     });
     
     // Bouton permettant le retour au menu

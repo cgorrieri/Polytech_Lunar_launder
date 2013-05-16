@@ -79,7 +79,6 @@ Quintus.LunarLaunder = function(Q) {
       this.p.y = Q.YtoPy(this.Y = X.e(3));
       // Affichage des valeurs
       Q.panel.set({
-       "temps":(this.tVol+=this.Te).toFixed(1),
              "x_value": X.e(1).toFixed(2),
              "x_point": X.e(2).toFixed(2),
              "y_value": X.e(3).toFixed(2),
