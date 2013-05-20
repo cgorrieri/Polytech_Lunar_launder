@@ -93,7 +93,7 @@ Quintus.LunarLaunder = function(Q) {
       this.mfuelCons = (Math.abs(this.ax) + Math.abs(this.ay))*dt;
       this.mfuel -= this.mfuelCons;
       if(this.mfuel<0) {
-        his.mfuel=0;
+        this.mfuel=0;
         this.ax=0;
         this.ay=0;
       } else {
@@ -230,8 +230,6 @@ Quintus.LunarLaunder = function(Q) {
         //            (   Ad    -  Bd . Ki ) .  Xn   +  Bb.  K   .   Cn        -      Bd  . Un
         this.state = ((Ad.subtract(Bd.x(Ki))).x(X)).add(Bd.x(Ki).x(this.Ch)).subtract(Bd.x(this.Un));
         this.currentStep++;
-      } else {
-        
       }
     }
   });

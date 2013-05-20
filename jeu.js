@@ -31,7 +31,8 @@ window.addEventListener("load",function() {
   };
   
   // Initialisation du panel
-  Q.panel = new Q.LeftPanel();
+  Q.panel = new Q.LeftPanel({id:"panel"});
+  Q.panel.hide();
   
   // TOUCHE CLAVIER
   // 'm' pour la commande manuelle
@@ -98,8 +99,9 @@ window.addEventListener("load",function() {
         label: "Loi de commandes", type: Q.SPRITE_UI },
         function() {
         Q.clearStages();
+        Q.panel.show();
         Target = new Q.Target({x:0,y:0, asset:"target.png"});
-        Q.panel.show("state");
+        Q.panel.showGroup("state");
         Q.stageScene('lunarGame');
         }));
     // Lance l'observation du mobile
@@ -108,7 +110,8 @@ window.addEventListener("load",function() {
         label: "Poursuite", type: Q.SPRITE_UI },
         function() {
         Q.clearStages();
-        Q.panel.show("observer");
+        Q.panel.show();
+        Q.panel.showGroup("observer");
         Q.stageScene('observerGame');
         }));
     box.fit(20);
@@ -137,6 +140,8 @@ window.addEventListener("load",function() {
       label: "Menu", type: Q.SPRITE_UI },
       function() {
       Q.clearStages();
+      Q.panel.hide();
+      Q.panel.hideAll();
       Q.stageScene('main_menu');
     }));
   });
@@ -175,8 +180,8 @@ window.addEventListener("load",function() {
     // Touche 'm' : Change le lunar courrant par un lunar à comande manuelle
     Q.input.on('manual', stage, function(e) {
       Q.stage().pause();
-      Q.panel.hide("valPropres");
-      Q.panel.hide("commandOptimal");
+      Q.panel.hideAll();
+      Q.panel.showGroup("state");
       stage.remove(Target);
       stage.remove(LunarLander);
       LunarLander = new Q.LunarManual({state:LunarLander.state});
@@ -187,8 +192,8 @@ window.addEventListener("load",function() {
     // Touche 'e' : Change le lunar courrant par un lunar à comande par retour d'état
     Q.input.on('retEtat', stage, function(e) {
       Q.stage().pause();
-      Q.panel.show("valPropres");
-      Q.panel.hide("commandOptimal");
+      Q.panel.hideAll();
+      Q.panel.showGroup(["state","valPropres"]);
       stage.remove(LunarLander);
       stage.insert(Target);
       LunarLander = new Q.LunarRetourEtat({state:LunarLander.state, target:Target});
@@ -199,8 +204,8 @@ window.addEventListener("load",function() {
     // Touche 'h' : Change le lunar courrant par un lunar à comande optimale
     Q.input.on('optimal', stage, function(e) {
       Q.stage().pause();
-      Q.panel.hide("valPropres");
-      Q.panel.show("commandOptimal");
+      Q.panel.hideAll();
+      Q.panel.showGroup(["state","commandOptimal"]);
       stage.remove(LunarLander);
       stage.insert(Target);
       LunarLander = new Q.LunarOptimal({state:LunarLander.state, target:Target});
@@ -228,6 +233,8 @@ window.addEventListener("load",function() {
       label: "Menu", type: Q.SPRITE_UI },
       function() {
         Q.clearStages();
+        Q.panel.hide();
+        Q.panel.hideAll();
         Q.stageScene('main_menu');}
     ));
   });

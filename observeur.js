@@ -49,7 +49,7 @@ Quintus.Observeur = function(Q) {
                 y: infoMobile[2] + infoMobile[3]*this.nbMesures*Q.Te, vy:infoMobile[3]});
         
         // On ajoute notre lunar au jeu
-        Q.stage().insert(new Q.LunarRetourEtat({scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest}))
+        Q.stage().insert(new Q.LunarOptimal({scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest}))
         
         // On incrémente pour ne plus rentrer dans les calculs
         this.currMesure++;
