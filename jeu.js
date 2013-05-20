@@ -20,7 +20,7 @@ window.addEventListener("load",function() {
   // canvas element on the page. If you already have a 
   // canvas element in your page, you can pass the element
   // or it's id as the first parameter to set up as well.
-  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, Target, LunarPanel, LunarLaunder, Observeur").setup("game").controls().touch();
+  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, Target, Panel, LunarLaunder, Observeur").setup("game").controls().touch();
   Q.options = {
     imagePath: "images/",
     audioPath: "audio/",
@@ -31,7 +31,7 @@ window.addEventListener("load",function() {
   };
   
   // Initialisation du panel
-  Q.panel = new Q.PanelState();
+  Q.panel = new Q.LeftPanel();
   
   // TOUCHE CLAVIER
   // 'm' pour la commande manuelle

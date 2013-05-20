@@ -1,6 +1,6 @@
-Quintus.LunarPanel = function(Q) {
+Quintus.Panel = function(Q) {
   // Element qui permet de modifier l'affichage du panel
-  Q.GameObject.extend("PanelState",{
+  Q.GameObject.extend("LeftPanel",{
     init: function(p) {
       this.p = Q._extend({},p);
       this.dom = {};
