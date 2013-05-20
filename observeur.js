@@ -50,10 +50,10 @@ Quintus.Observeur = function(Q) {
         
         var lunarInfos = {scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest};
                 
-        if(Q.panel.getRadio("observer_commande") == "ret") {
+        if(Q.ObserverCommande == "ret") {
           Q.panel.hideGroup("commandOptimal");
           Q.stage().insert(new Q.LunarRetourEtat(lunarInfos));
-        } else if (Q.panel.getRadio("observer_commande") == "opt") {
+        } else if (Q.ObserverCommande == "opt") {
           Q.stage().pause();
           Q.stage().insert(new Q.LunarOptimal(lunarInfos));
           Q.panel.showGroup("commandOptimal");

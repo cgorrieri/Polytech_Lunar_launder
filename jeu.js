@@ -117,6 +117,8 @@ window.addEventListener("load",function() {
     box.fit(20);
   });
   
+  Q.ObserverCommande = "ret";
+  
   // Observation de la trajectoire d'un mobile
   Q.scene("observerGame",function(stage) {
     // Initialisation du mobile
@@ -133,6 +135,22 @@ window.addEventListener("load",function() {
     Q.gameLoop(function(dt) {
       _fixe(dt);
       Q.stageGameLoop(dt);
+    });
+    
+    // Touche 'e' : commande par retour d'état
+    Q.input.on('retEtat', stage, function(e) {
+      if(Q.ObserverCommande != "ret") {
+        Q.ObserverCommande = "ret"
+        Q.stageScene('observerGame');
+      }
+    });
+
+    // Touche 'h' : Change le lunar courrant par un lunar à comande optimale
+    Q.input.on('optimal', stage, function(e) {
+      if(Q.ObserverCommande != "opt") {
+        Q.ObserverCommande = "opt"
+        Q.stageScene('observerGame');
+      }
     });
     
     // Bouton permettant le retour au menu
