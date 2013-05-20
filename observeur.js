@@ -1,5 +1,4 @@
 Quintus.Observeur = function(Q) {
-  var Vmobile = 2; // en m/s
 
   // Observateur qui va definir la trajectoire du Mobile
   Q.Sprite.extend("Observateur",{
@@ -13,7 +12,6 @@ Quintus.Observeur = function(Q) {
       this.V = 5;
       this.angleRotation = (p.angle ? p.angle : 0);
       this.mobile = p.mobile;
-      this.vxSuivre = this.vySuivre = Vmobile;
 	  
       this.teta = new Array();
       this.ci = new Array();
@@ -29,8 +27,8 @@ Quintus.Observeur = function(Q) {
         this.vy = this.V * Math.sin(this.angleRotation);
 
         // Position mathématique
-        this.X += (this.vx+this.vxSuivre) * Q.Te;
-        this.Y += (this.vy+this.vySuivre) * Q.Te;
+        this.X += (this.vx+this.mobile.vx) * Q.Te;
+        this.Y += (this.vy+this.mobile.vy) * Q.Te;
         // Position à l'affichage
         this.p.x = Q.XtoPx(this.X);
         this.p.y = Q.YtoPy(this.Y);

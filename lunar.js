@@ -136,27 +136,6 @@ Quintus.LunarLaunder = function(Q) {
       this.Un = $V([0, - g/this.erg]);
     },
   });
-  
-  // Mobile suivant une trajectoire linéaire
-  Q.Sprite.extend("Target",{
-    init: function(p) {
-      this._super(p, {});
-      // position mathématique
-      this.X = p.x;
-      this.Y = p.y;
-      // vitesse en m/s
-      this.vx = (p.vx ? p.vx : 0);
-      this.vy = (p.vy ? p.vy : 0);
-    },
-    step: function(dt) {
-      // x(t+1) = x(t) + vx(t)*dt
-      this.X += this.vx * Q.Te;
-      this.Y += this.vy * Q.Te;
-      
-      this.p.x = Q.XtoPx(this.X);
-      this.p.y = Q.YtoPy(this.Y);
-    }
-  });
 
   /*
    * LunarLander abstrait ayant une consigne

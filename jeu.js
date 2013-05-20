@@ -20,7 +20,7 @@ window.addEventListener("load",function() {
   // canvas element on the page. If you already have a 
   // canvas element in your page, you can pass the element
   // or it's id as the first parameter to set up as well.
-  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, LunarLaunder, LunarPanel, Observeur").setup("game").controls().touch();
+  var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, Target, LunarPanel, LunarLaunder, Observeur").setup("game").controls().touch();
   Q.options = {
     imagePath: "images/",
     audioPath: "audio/",
@@ -117,10 +117,10 @@ window.addEventListener("load",function() {
   // Observation de la trajectoire d'un mobile
   Q.scene("observerGame",function(stage) {
     // Initialisation du mobile
-    var mobile = new Q.Mobile({x:50, y:50, asset:"observer.png", scale:0.2});
+    var mobile = new Q.Target({x:50, y:50, vx:2,vy:2, asset:"mobile.png", scale:0.3});
     stage.insert(mobile);
     // Affichage de l'état initial du mobile
-    Q.panel.set({"reel_mobile_x_value":50,	"reel_mobile_x_speed":5,
+    Q.panel.set({"reel_mobile_x_value":50,	"reel_mobile_x_speed":2,
                "reel_mobile_y_value":50,	"reel_mobile_y_speed":2});
     // Initialisation de l'observeur
     var observer = new Q.Observateur({x:15, y:65, angle:Math.PI/2, mobile:mobile});
@@ -262,7 +262,7 @@ window.addEventListener("load",function() {
 
   // Initialisation
   // Chargement des images
-  Q.load(["lunar.png", "observer.png", "target.png"],function() {
+  Q.load(["lunar.png", "observer.png", "target.png", "mobile.png"],function() {
     // Lancement du menu principale
     Q.stageScene("main_menu");
   });
