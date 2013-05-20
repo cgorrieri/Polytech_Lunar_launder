@@ -147,7 +147,16 @@ Quintus.LunarLaunder = function(Q) {
       this.target = p.target;
       // Vecteur de consigne
       this.Cn = $V([p.target.X, p.target.vx, p.target.Y, p.target.vy]);
+      // Vecteur correspondant au déplacememnt de la consigne à chaque instant
+      this.AddCn = [this.Cn.e(2)*Q.Te, 0, this.Cn.e(4)*Q.Te, 0];
     },
+    calc :function(dt) {
+      // Evolution de la consigne par rapport à sa vitesse
+      this.Cn = this.Cn.add(this.AddCn);
+      this.sousCalc(dt);
+    },
+    // à redéfinir
+    sousCalc : function() {},
     // Méthodes de controle de la consigne
     up: function() {this.addTargetY(1);},
     down: function() {this.addTargetY(-1);},
@@ -176,16 +185,10 @@ Quintus.LunarLaunder = function(Q) {
       this._super(p, { });
       this.matGluneErg = $V([0, 0]);
       this.type="ret";
-      
-      // Vecteur correspondant au déplacememnt de la consigne à chaque instant
-      this.AddCn = [this.Cn.e(2)*Q.Te, 0, this.Cn.e(4)*Q.Te, 0];
     },
-    calc: function(dt) {
+    sousCalc: function(dt) {
       var X=this.state;
       var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
-      
-      // Evolution de la consigne par rapport à sa vitesse
-      this.Cn = this.Cn.add(this.AddCn);
       
       // Récuperer ax et ay
       axy = Q.valPropres.x(this.Cn.subtract(X));
@@ -207,13 +210,11 @@ Quintus.LunarLaunder = function(Q) {
       this.type="opt";
       // Indice sur le tableau Kn
       this.currentStep = 0;
-      this.Ch = this.Cn;
     },
     resetMore: function() {
       this.currentStep = 0;
-      this.Ch = this.Cn;
     },
-    calc: function(dt) {
+    sousCalc: function(dt) {
       // Si on n'a pas atteint l'horizon
       if(this.currentStep < Q.Kn.length) {
         var X=this.state;
@@ -222,14 +223,17 @@ Quintus.LunarLaunder = function(Q) {
         var Ki = Q.Kn[this.currentStep];
         
         // Récuperer axn et ayn
-        axy = Ki.x(this.Ch.subtract(X));
+        axy = Ki.x(this.Cn.subtract(X));
         this.ax = axy.e(1);
         this.ay = axy.e(2);
         
         // Calcule du nouveau vecteur d'état
         //            (   Ad    -  Bd . Ki ) .  Xn   +  Bb.  K   .   Cn        -      Bd  . Un
-        this.state = ((Ad.subtract(Bd.x(Ki))).x(X)).add(Bd.x(Ki).x(this.Ch)).subtract(Bd.x(this.Un));
+        this.state = ((Ad.subtract(Bd.x(Ki))).x(X)).add(Bd.x(Ki).x(this.Cn)).subtract(Bd.x(this.Un));
         this.currentStep++;
+        console.log(this.state);
+      } else {
+        this.state = this.state.add([this.state.e(2)*Q.Te,0,this.state.e(4)*Q.Te,0]);
       }
     }
   });

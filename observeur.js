@@ -48,8 +48,20 @@ Quintus.Observeur = function(Q) {
         mobileDest = new Q.Target({x:infoMobile[0]+infoMobile[1]*this.nbMesures*Q.Te, vx:infoMobile[1],
                 y: infoMobile[2] + infoMobile[3]*this.nbMesures*Q.Te, vy:infoMobile[3]});
         
-        // On ajoute notre lunar au jeu
-        Q.stage().insert(new Q.LunarOptimal({scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest}))
+        var lunarInfos = {scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest};
+                
+        if(Q.panel.getRadio("observer_commande") == "ret") {
+          Q.panel.hideGroup("commandOptimal");
+          Q.stage().insert(new Q.LunarRetourEtat(lunarInfos));
+        } else if (Q.panel.getRadio("observer_commande") == "opt") {
+          Q.stage().pause();
+          Q.stage().insert(new Q.LunarOptimal(lunarInfos));
+          Q.panel.showGroup("commandOptimal");
+          if(Q.Kn == null)
+            alert("Veuillez selectionner le fichier de commande (dans le panel)");
+          else
+          Q.stage().unpause();
+        }
         
         // On incrémente pour ne plus rentrer dans les calculs
         this.currMesure++;

@@ -21,6 +21,16 @@ Quintus.Panel = function(Q) {
       return document.getElementById(key).value;
     },
     
+    getRadio: function(key) {
+      var radios = document.getElementsByName(key);
+
+      for (var i = 0, length = radios.length; i < length; i++) {
+        if (radios[i].checked) {
+            return radios[i].value;
+        }
+      }
+    },
+    
     // Définit la valeur d'un champs
     _setProperty: function(value,key) {
         document.getElementById(key).value = value;
