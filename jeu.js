@@ -61,7 +61,7 @@ window.addEventListener("load",function() {
   // Temps d'échantillonnage
   Q.Te = 0.04;
   // Affichage du Te
-  Q.panel.set({"te" : (te*1000).toFixed(0)});
+  Q.panel.set({"te" : (Q.Te*1000).toFixed(0)});
   
   // Echel d'afichage et px/metre
   Q.ScalePM = 4;
@@ -130,7 +130,6 @@ window.addEventListener("load",function() {
     Q.gameLoop(function(dt) {
       _fixe(dt);
       Q.stageGameLoop(dt);
-      Q.panel.set({"temps":(this.tVol+=Q.Te).toFixed(1)});
     });
     
     // Bouton permettant le retour au menu
@@ -222,7 +221,6 @@ window.addEventListener("load",function() {
       // fixe Te
       _fixe(dt);
       Q.stageGameLoop(dt);
-      Q.panel.set({"temps":(this.tVol+=Q.Te).toFixed(1)});
     });
     
     // Bouton permettant le retour au menu

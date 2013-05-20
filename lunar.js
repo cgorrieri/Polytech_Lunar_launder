@@ -40,6 +40,7 @@ Quintus.LunarLaunder = function(Q) {
         Q.stage().pause();
         Q.stageScene("endLunarGame",1);
       }
+      this.tVol += Q.Te;
       this.calc(dt);
       this._calculFuel(dt);
       this._updateState();
@@ -78,7 +79,8 @@ Quintus.LunarLaunder = function(Q) {
       this.p.x = Q.XtoPx(this.X = X.e(1));
       this.p.y = Q.YtoPy(this.Y = X.e(3));
       // Affichage des valeurs
-      Q.panel.set({
+      Q.panel.set({     
+             "temps":(this.tVol+=Q.Te).toFixed(1),
              "x_value": X.e(1).toFixed(2),
              "x_point": X.e(2).toFixed(2),
              "y_value": X.e(3).toFixed(2),
