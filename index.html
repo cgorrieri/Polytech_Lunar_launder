@@ -35,6 +35,14 @@
       <h2>Control</h2>
       <p><label>Te (ms)</label><input type="text" id="te"/></p>
       <p><label>T vol </label><input type="text" id="temps"/></p>
+      <div id="commandOptimal">
+        <h2>Comande optimale</h2>
+        <input type="file" id="optimalCommandeFile" name="file" />
+        <div id="fileLoadResult">Aucun fichier chargé !</div>
+        <script type="text/javascript">
+          document.getElementById('optimalCommandeFile').addEventListener('change', handleFileSelect, false);
+        </script>
+      </div>
       <div id="observer">
         <h3>Commande utilisée</h3>
         <p><label>Retour d'état</label><input type="radio" name="observer_commande" value="ret" checked></p>
@@ -63,15 +71,6 @@
         <p><input type="text" id="11"/> <input type="text" id="12"/> <input type="text" id="13"/> <input type="text" id="14"/></p>
         <p><input type="text" id="21"/> <input type="text" id="22"/> <input type="text" id="23"/> <input type="text" id="24"/></p>
         <p><input type="submit" value="ok" onclick="Q.setValPropres();">
-      </div>
-      <div id="commandOptimal">
-        <h2>Comande optimale</h2>
-        <h3>Fichier de commande :</h3>
-        <input type="file" id="optimalCommandeFile" name="file" />
-        <div id="fileLoadResult">Aucun fichier chargé !</div>
-        <script type="text/javascript">
-          document.getElementById('optimalCommandeFile').addEventListener('change', handleFileSelect, false);
-        </script>
       </div>
     </div>
   </body>
