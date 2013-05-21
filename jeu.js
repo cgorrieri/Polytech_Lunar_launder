@@ -177,22 +177,53 @@ window.addEventListener("load",function() {
     // On ajoute le module lunaire à la scène
     stage.insert(LunarLander);
     
+    addTargetX = function(ax) {
+      if(LunarLander.Cn.e(1) + ax >= 0) {
+        LunarLander.Cn = LunarLander.Cn.add([ax, 0, 0, 0]);
+        Target.X += ax;
+       }
+    };
+    addTargetY = function(ay) {
+      if(LunarLander.Cn.e(3) + ay >= 0) {
+        LunarLander.Cn = LunarLander.Cn.add([0, 0, ay, 0]);
+        Target.Y = ay;
+      }
+    };
+    
     // Affectation des touches
     Q.input.on('up', stage, function(e) {
-      LunarLander.up();
+      if(LunarLander.type = "man") {
+        LunarLander.up();
+      } else {
+        addTargetY(1);
+      }
     });
     Q.input.on('down', stage, function(e) {
-      LunarLander.down();
+      if(LunarLander.type = "man") {
+        LunarLander.down();
+      } else {
+        addTargetY(-1);
+      }
     });
     Q.input.on('left', stage, function(e) {
-      LunarLander.left();
+      if(LunarLander.type = "man") {
+        LunarLander.left();
+      } else {
+        addTargetX(-1);
+      }
     });
     Q.input.on('right', stage, function(e) {
-      LunarLander.right();
+      if(LunarLander.type = "man") {
+        LunarLander.right();
+      } else {
+        addTargetX(-1);
+      }
     });
     // La touche espace
     Q.input.on('fire', stage, function(e) {
-      LunarLander.space();
+      if(LunarLander.type = "man") {
+        LunarLander.space();
+      }
     });
     
     // Touche 'm' : Change le lunar courrant par un lunar à comande manuelle

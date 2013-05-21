@@ -63,15 +63,15 @@ Quintus.LunarLaunder = function(Q) {
       this.resetMore();
     },
     // méthode à modifier qui calcul l'état
-    calc: function(dt){},
+    calc: function(dt){
+      var X=this.state;
+      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
+
+      // Calcule du nouveau vecteur d'état
+      this.state = (Ad.x(X)).add(Bd.x(this.Un));
+    },
     // Permet au fille de resetter leurs attributs
     resetMore: function(){},
-    // fonction de control
-    up: function() {},
-    down: function() {},
-    right: function() {},
-    left: function() {},
-    space: function() {},
     // Place le lunar et affiche son état
     _updateState : function() {
       var X = this.state;
@@ -109,13 +109,6 @@ Quintus.LunarLaunder = function(Q) {
     init: function(p) {
       this._super(p, { });
       this.type="man";
-    },
-    calc: function(dt) {
-      var X=this.state;
-      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
-
-      // Calcule du nouveau vecteur d'état
-      this.state = (Ad.x(X)).add(Bd.x(this.Un));
     },
     // definition des methodes de controle
     up: function() {this.addAy(1);},
