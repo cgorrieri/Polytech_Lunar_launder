@@ -62,13 +62,13 @@ Quintus.LunarLaunder = function(Q) {
       this.tVol = 0; // temps de vol total
       this.resetMore();
     },
-    // méthode à modifier qui calcul l'état
+    // Méthode qui calcul l'état suivant  
     calc: function(dt){
       var X=this.state;
       var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
 
       // Calcule du nouveau vecteur d'état
-      this.state = (Ad.x(X)).add(Bd.x(this.Un));
+      this.state = (Ad.x(X)).add(Bd.x(Un));
     },
     // Permet au fille de resetter leurs attributs
     resetMore: function(){},
@@ -110,7 +110,7 @@ Quintus.LunarLaunder = function(Q) {
       this._super(p, { });
       this.type="man";
     },
-    // definition des methodes de controle
+    // Définition des méthodes de contrôle
     up: function() {this.addAy(1);},
     down: function() {this.addAy(-1);},
     right: function() {this.addAx(1);},
@@ -136,38 +136,18 @@ Quintus.LunarLaunder = function(Q) {
   Q.Lunar.extend("LunarTarget",{
     init: function(p) {
       this._super(p, { });
-      // Objet à atteindre
-      this.target = p.target;
       // Vecteur de consigne
       this.Cn = $V([p.target.X, p.target.vx, p.target.Y, p.target.vy]);
-      // Vecteur correspondant au déplacememnt de la consigne à chaque instant
+      // Vecteur correspondant au déplacememt de la consigne à chaque instant
       this.AddCn = [this.Cn.e(2)*Q.Te, 0, this.Cn.e(4)*Q.Te, 0];
     },
-    calc :function(dt) {
+    calc: function(dt) {
       // Evolution de la consigne par rapport à sa vitesse
       this.Cn = this.Cn.add(this.AddCn);
       this.sousCalc(dt);
     },
-    // à redéfinir
-    sousCalc : function() {},
-    // Méthodes de controle de la consigne
-    up: function() {this.addTargetY(1);},
-    down: function() {this.addTargetY(-1);},
-    right: function() {this.addTargetX(1);},
-    left: function() {this.addTargetX(-1);},
-    space: function() {},
-    addTargetX: function(ax) {
-      if(this.Cn.e(1) + ax >= 0) {
-        this.Cn = this.Cn.add([ax, 0, 0, 0]);
-        this.target.X = this.Cn.e(1);
-       }
-    },
-    addTargetY: function(ay) {
-      if(this.Cn.e(3) + ay >= 0) {
-        this.Cn = this.Cn.add([0, 0, ay, 0]);
-        this.target.Y = this.Cn.e(3);
-      }
-    }
+    // À redéfinir
+    sousCalc: function() {},
   });
   
   /*
@@ -181,7 +161,7 @@ Quintus.LunarLaunder = function(Q) {
     },
     sousCalc: function(dt) {
       var X=this.state;
-      var Ad = this.Ad, Bd = this.Bd, Un = this.Un;
+      var Ad = this.Ad, Bd = this.Bd;
       
       // Récuperer ax et ay
       axy = Q.valPropres.x(this.Cn.subtract(X));

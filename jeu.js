@@ -186,42 +186,42 @@ window.addEventListener("load",function() {
     addTargetY = function(ay) {
       if(LunarLander.Cn.e(3) + ay >= 0) {
         LunarLander.Cn = LunarLander.Cn.add([0, 0, ay, 0]);
-        Target.Y = ay;
+        Target.Y += ay;
       }
     };
     
     // Affectation des touches
     Q.input.on('up', stage, function(e) {
-      if(LunarLander.type = "man") {
+      if(LunarLander.type == "man") {
         LunarLander.up();
       } else {
         addTargetY(1);
       }
     });
     Q.input.on('down', stage, function(e) {
-      if(LunarLander.type = "man") {
+      if(LunarLander.type == "man") {
         LunarLander.down();
       } else {
         addTargetY(-1);
       }
     });
     Q.input.on('left', stage, function(e) {
-      if(LunarLander.type = "man") {
+      if(LunarLander.type == "man") {
         LunarLander.left();
       } else {
         addTargetX(-1);
       }
     });
     Q.input.on('right', stage, function(e) {
-      if(LunarLander.type = "man") {
+      if(LunarLander.type == "man") {
         LunarLander.right();
       } else {
-        addTargetX(-1);
+        addTargetX(1);
       }
     });
     // La touche espace
     Q.input.on('fire', stage, function(e) {
-      if(LunarLander.type = "man") {
+      if(LunarLander.type == "man") {
         LunarLander.space();
       }
     });
