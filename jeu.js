@@ -1,26 +1,22 @@
-// # Quintus moving ball example
-//
-// [Run the example](../examples/ball/index.html)
-//
-// This is one of the simplest possible examples of using 
-// Quintus that doesn't use the scene/stage functionality, 
-// but rather just creates a single sprite and steps and 
-// draws that sprite
-//
-// The goal of the example is to demonstrate the modularity
-// of the engine and the ability to only include the components
-// you actually need.
+/*
+***************************************************
+* jeu.js                                          *
+* 	Script principal de l'animation               *
+*                                                 *
+* Auteurs :                                       *
+* 	Loïc FAIZANT, Cyril GORRIERI, Maurice RAMBERT *
+*                                                 *
+* Ecole Polytech' Nice Sophia Antipolis           *
+* Sciences Informatiques - 4e année               *
+***************************************************
+*/
 
 
-// Wait for the load event to start the game.
-window.addEventListener("load",function() {
-
-  // Create an instance of the engine, including only
-  // the `Sprites` module, and then call setup to create a
-  // canvas element on the page. If you already have a 
-  // canvas element in your page, you can pass the element
-  // or it's id as the first parameter to set up as well.
+// Définir le chargement de la page
+window.addEventListener("load", function() {
+  // Instancier le moteur graphique avec les composants nécessaires à l'animation
   var Q = window.Q =  Quintus().include("Sprites, Scenes, Touch, Input, UI, Target, Panel, LunarLaunder, Observeur").setup("game").controls().touch();
+  // Définir les options du moteur graphique
   Q.options = {
     imagePath: "images/",
     audioPath: "audio/",
@@ -30,114 +26,130 @@ window.addEventListener("load",function() {
     frameTimeLimit: 40
   };
   
-  // Initialisation du panel
+  // Initialiser le panel de l'animation
   Q.panel = new Q.LeftPanel({id:"panel"});
   Q.panel.hide();
   
-  // TOUCHE CLAVIER
-  // 'm' pour la commande manuelle
-  Q.input.bindKey(77, "manual");
-  // 'e' pour la commande par retours d'état
-  Q.input.bindKey(69, "retEtat");
-  // 'h' pour la commande optimale
-  Q.input.bindKey(72, "optimal");
-  // 'r' pour le reset
-  Q.input.bindKey(82, "reset");
+  // Mapper les touches clavier avec les commandes du module lunaire
+  Q.input.bindKey(77, "manual"); // 'm' : commande manuelle
+  Q.input.bindKey(69, "retEtat"); // 'e' : commande par retour d'état
+  Q.input.bindKey(72, "optimal"); // 'h' : commande optimale
+  Q.input.bindKey(82, "reset"); // 'r' : remise à zéro de l'animation
   
-  // Valeurs propres pour la commande par retour d'état
+  // Définir les valeurs propres pour la commande par retour d'état
   Q.valPropres = $M([[0.33,		1.11,		0.0,	0.0],
                       [0.0,		0.0,		0.33,	1.11]]);
-  // Affichage de la matrice
+  // Afficher les valeurs propres initiales
   Q.panel.set({"11":0.33,	"12":1.11,"13":0.0,	"14":0.0,
                "21":0.0,	"22":0.0,	"23":0.33,"24":1.11});
-  // Recupere les nouvelles valeurs propres dans le panel
+  // Définir les valeurs propres de l'animation avec les valeurs saisies via l'interface
   Q.setValPropres = function() {
     Q.valPropres = $M([[parseFloat(Q.panel.get("11")),parseFloat(Q.panel.get("12")),parseFloat(Q.panel.get("13")),parseFloat(Q.panel.get("14"))],
                       [parseFloat(Q.panel.get("21")),parseFloat(Q.panel.get("22")),parseFloat(Q.panel.get("23")),parseFloat(Q.panel.get("24"))]]);
   }
   
-  // Tableau des valeurs propres pour la commande optimale
+  // Initialiser le tableau des valeurs propres pour la commande optimale
   Q.Kn = null;
   
-  // Temps d'échantillonnage
+  // Définir la période d'échantillonnage
   Q.Te = 0.04;
-  // Affichage du Te
+  // Afficher la période d'échantillonnage
   Q.panel.set({"te" : (Q.Te*1000).toFixed(0)});
   
-  // Echel d'afichage et px/metre
+  // Définir l'échelle d'espace (pixels/mètre)
   Q.ScalePM = 4;
   
-  // Permet de fixer dt à Te pour avoir un temps cohérent
+  // Assurer la cohérence du temps en fixant l'intervalle de temps à la période d'échantillonnage
   _fixe = function(dt) {
-      // fixe dt à Te
       lastGameLoopFrame = new Date().getTime()+(dt*1000);
       var now;
-      do{
+      do {
         now = new Date().getTime();
         dt = now - Q.lastGameLoopFrame;
       } while(dt < Q.options.frameTimeLimit);
-      if(dt>= Q.options.frameTimeLimit) return Q.options.frameTimeLimit;
+      if(dt >= Q.options.frameTimeLimit) return Q.options.frameTimeLimit;
       return dt;
     }
   
-  // LunarLander
+  // Instancier le module lunaire
   var LunarLander;
-  // Consigne
+  // Instancier la consigne de commande
   var Target;
   
+  // --- Fonction XtoPx
+  //	Convertit la position (abscisse) en pixels
+  //		x :
+  //			position à convertir
   Q.XtoPx = function(x) {return x * Q.ScalePM;}
+  
+  // --- Fonction YtoPx
+  //	Convertit la position (ordonnée) en pixels
+  //		y :
+  //			position à convertir
   Q.YtoPy = function(y) {return Q.height - y * Q.ScalePM;}
   
-  // Menu principale
-  Q.scene("main_menu",function(stage) {
+  // Définir le menu principal de la simulation
+  Q.scene("main_menu", function(stage) {
     var box = stage.insert(new Q.UI.Container({
       x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
     }));
-    // Lance la simulation de Lunar Lander
+	
+    // Afficher le bouton pour la simulation des lois de commande
     var lunarGame = box.insert(
-      new Q.UI.Button({ x: 0, y: 0, fill: "#CCCCCC",
-        label: "Loi de commandes", type: Q.SPRITE_UI },
+      new Q.UI.Button({x:0, y:0, fill:"#CCCCCC", label:"Loi de commandes", type:Q.SPRITE_UI},
         function() {
-        Q.clearStages();
-        Q.panel.show();
-        Target = new Q.Target({x:0,y:0, asset:"target.png"});
-        Q.panel.showGroup("state");
-        Q.stageScene('lunarGame');
+			// Réinitialiser l'animation
+			Q.clearStages();
+			// Afficher le panel
+			Q.panel.show();
+			// Initialiser la consigne de commande
+			Target = new Q.Target({x:0,y:0, asset:"target.png"});
+			// Afficher les contrôles du module
+			Q.panel.showGroup("state");
+			// Lancer la simulation de l'alunissage
+			Q.stageScene('lunarGame');
         }));
-    // Lance l'observation du mobile
+		
+    // Afficher le bouton pour la simulation de poursuite
     var observerGame = box.insert(
-      new Q.UI.Button({ x: 0, y: 10+lunarGame.p.h, fill: "#CCCCCC",
-        label: "Poursuite", type: Q.SPRITE_UI },
+      new Q.UI.Button({x:0, y:10 + lunarGame.p.h, fill:"#CCCCCC", label:"Poursuite", type:Q.SPRITE_UI},
         function() {
-        Q.clearStages();
-        Q.panel.show();
-        Q.panel.showGroup("observer");
-        Q.stageScene('observerGame');
+			// Réinitialiser l'animation
+			Q.clearStages();
+			// Afficher le panel
+			Q.panel.show();
+			// Afficher les contrôles du mobile
+			Q.panel.showGroup("observer");
+			// Lancer la simulation de poursuite
+			Q.stageScene('observerGame');
         }));
     box.fit(20);
   });
   
+  // Initialiser la commande du module avec la commande par retour d'état
   Q.ObserverCommande = "ret";
   
-  // Observation de la trajectoire d'un mobile
-  Q.scene("observerGame",function(stage) {
-    // Initialisation du mobile
+  // Définir l'observation de la trajectoire du mobile
+  Q.scene("observerGame", function(stage) {
+    // Initialiser le mobile
     var mobile = new Q.Target({x:50, y:50, vx:2,vy:2, asset:"mobile.png", scale:0.3});
+	// Insérer le mobile dans l'animation
     stage.insert(mobile);
-    // Affichage de l'état initial du mobile
+    // Afficher l'état du mobile
     Q.panel.set({"reel_mobile_x_value":50,	"reel_mobile_x_speed":2,
                "reel_mobile_y_value":50,	"reel_mobile_y_speed":2});
-    // Initialisation de l'observeur
+    // Initialiser l'observateur
     var observer = new Q.Observateur({x:15, y:65, angle:Math.PI/2, mobile:mobile});
+	// Insérer l'observateur dans l'animation
     stage.insert(observer);
     
-    // boocle de jeu
+    // Définir la boucle de l'animation
     Q.gameLoop(function(dt) {
       _fixe(dt);
       Q.stageGameLoop(dt);
     });
     
-    // Touche 'e' : commande par retour d'état
+    // Gérer les touches clavier pour le changement de type de commande
     Q.input.on('retEtat', stage, function(e) {
       if(Q.ObserverCommande != "ret") {
         Q.ObserverCommande = "ret"
@@ -145,7 +157,6 @@ window.addEventListener("load",function() {
       }
     });
 
-    // Touche 'h' : Change le lunar courrant par un lunar à comande optimale
     Q.input.on('optimal', stage, function(e) {
       if(Q.ObserverCommande != "opt") {
         Q.ObserverCommande = "opt"
@@ -153,44 +164,63 @@ window.addEventListener("load",function() {
       }
     });
     
-    // Bouton permettant le retour au menu
-    var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
-      label: "Menu", type: Q.SPRITE_UI },
+    // Afficher le bouton de retour au menu
+    var button = stage.insert(new Q.UI.Button({x:0+50, y:0+30, fill:"#CCCCCC", label:"Menu", type:Q.SPRITE_UI},
       function() {
-      Q.clearStages();
-      Q.panel.hide();
-      Q.panel.hideAll();
-      Q.stageScene('main_menu');
+		  // Réinitialiser l'animation
+		  Q.clearStages();
+		  // Masquer les panels
+		  Q.panel.hide();
+		  Q.panel.hideAll();
+		  // Afficher le menu principal
+		  Q.stageScene('main_menu');
     }));
   });
   
-  // Simulation Lunar lander
+  // Définir la simulation de l'alunissage du module
   Q.scene("lunarGame",function(stage) {
-    // Si lunar n'est pas defini alors on le creer par défault en commande manuelle
+    // Contrôler l'éventuelle instanciation du module
     if(!LunarLander)
+	  // Instancier le module avec la commande manuelle
       LunarLander = new Q.LunarManual({state:$V([45, 1, 51, -1])});
-    else  {// Sinon on le reset
+    else  {
+	  // Réinitialiser le module
       LunarLander.reset($V([45, 1, 51, -1]));
-      if(LunarLander.type=="ret" || LunarLander.type=="opt")
+	  // Contrôler le type de commande affectée au module
+      if(LunarLander.type == "ret" || LunarLander.type== "opt")
+	    // Afficher l'éventuelle consigne de commande
         stage.insert(Target);
     }
-    // On ajoute le module lunaire à la scène
+    // Afficher le module
     stage.insert(LunarLander);
     
+	// --- Fonction addTargetX
+	//	Déplace la consigne de commande en abscisse
+	//		ax :
+	//			déplacement de consigne
     addTargetX = function(ax) {
+	  // Contrôler la validité du déplacement
       if(LunarLander.Cn.e(1) + ax >= 0) {
-        LunarLander.Cn = LunarLander.Cn.add([ax, 0, 0, 0]);
-        Target.X += ax;
+			// Mettre à jour la consigne
+			LunarLander.Cn = LunarLander.Cn.add([ax, 0, 0, 0]);
+			Target.X += ax;
        }
     };
+	
+	// --- Fonction addTargetY
+	//	Déplace la consigne de commande en abscisse
+	//		ay :
+	//			déplacement de consigne
     addTargetY = function(ay) {
+	  // Contrôler la validité du déplacement
       if(LunarLander.Cn.e(3) + ay >= 0) {
-        LunarLander.Cn = LunarLander.Cn.add([0, 0, ay, 0]);
-        Target.Y += ay;
+			// Mettre à jour la consigne
+			LunarLander.Cn = LunarLander.Cn.add([0, 0, ay, 0]);
+			Target.Y += ay;
       }
     };
     
-    // Affectation des touches
+    // Gérer les touches clavier pour le déplacement du module ou de la consigne
     Q.input.on('up', stage, function(e) {
       if(LunarLander.type == "man") {
         LunarLander.up();
@@ -219,96 +249,121 @@ window.addEventListener("load",function() {
         addTargetX(1);
       }
     });
-    // La touche espace
     Q.input.on('fire', stage, function(e) {
       if(LunarLander.type == "man") {
         LunarLander.space();
       }
     });
     
-    // Touche 'm' : Change le lunar courrant par un lunar à comande manuelle
+    // Traiter le cas d'un passage à une commande manuelle
     Q.input.on('manual', stage, function(e) {
-      Q.stage().pause();
-      Q.panel.hideAll();
-      Q.panel.showGroup("state");
-      stage.remove(Target);
-      stage.remove(LunarLander);
-      LunarLander = new Q.LunarManual({state:LunarLander.state});
-      stage.insert(LunarLander);
-      Q.stage().unpause();
+		// Mettre l'animation en pause
+		Q.stage().pause();
+		// Afficher l'état du module
+		Q.panel.hideAll();
+		Q.panel.showGroup("state");
+		// Désactiver la consigne
+		stage.remove(Target);
+		// Supprimer le module actuel
+		stage.remove(LunarLander);
+		// Redéfinir le module en commande manuelle
+		LunarLander = new Q.LunarManual({state:LunarLander.state});
+		// Insérer le nouveau module
+		stage.insert(LunarLander);
+		// Reprendre l'animation
+		Q.stage().unpause();
     });
     
-    // Touche 'e' : Change le lunar courrant par un lunar à comande par retour d'état
+    // Traiter le cas d'un passage à une commande par retour d'état
     Q.input.on('retEtat', stage, function(e) {
-      Q.stage().pause();
-      Q.panel.hideAll();
-      Q.panel.showGroup(["state","valPropres"]);
-      stage.remove(LunarLander);
-      stage.insert(Target);
-      LunarLander = new Q.LunarRetourEtat({state:LunarLander.state, target:Target});
-      stage.insert(LunarLander);
-      Q.stage().unpause();
+		// Mettre l'animation en pause
+		Q.stage().pause();
+		Q.panel.hideAll();
+		// Afficher l'état du module et les valeurs propres de la commande
+		Q.panel.showGroup(["state", "valPropres"]);
+		// Supprimer le module actuel
+		stage.remove(LunarLander);
+		// Insérer la commande de consigne
+		stage.insert(Target);
+		// Redéfinir le module en commande par retour d'état
+		LunarLander = new Q.LunarRetourEtat({state:LunarLander.state, target:Target});
+		// Insérer le nouveau module
+		stage.insert(LunarLander);
+		// Reprendre l'animation
+		Q.stage().unpause();
     });
 
-    // Touche 'h' : Change le lunar courrant par un lunar à comande optimale
+    // Traiter le cas d'un passage à une commande optimale
     Q.input.on('optimal', stage, function(e) {
-      Q.stage().pause();
-      Q.panel.hideAll();
-      Q.panel.showGroup(["state","commandOptimal"]);
-      stage.remove(LunarLander);
-      stage.insert(Target);
-      LunarLander = new Q.LunarOptimal({state:LunarLander.state, target:Target});
-      stage.insert(LunarLander);
-      if(Q.Kn != null) // Si les valeurs de la commande optimale sont chargées alors on continue
-        Q.stage().unpause();
+		// Mettre l'animation en pause
+		Q.stage().pause();
+		Q.panel.hideAll();
+		// Afficher l'état du module et les paramètres de la commande
+		Q.panel.showGroup(["state", "commandOptimal"]);
+		// Supprimer le module actuel
+		stage.remove(LunarLander);
+		// Insérer la commande de consigne
+		stage.insert(Target);
+		// Redéfinir le module en commande optimale
+		LunarLander = new Q.LunarOptimal({state:LunarLander.state, target:Target});
+		// Insérer le nouveau module
+		stage.insert(LunarLander);
+		// Contrôler la présence des paramètres de commande
+		if(Q.Kn != null)
+			// Reprendre l'animation
+			Q.stage().unpause();
     });
     
-    // Touche 'r' : Replace le Lunar à son état d'origine
+    // Traiter le cas d'une remise à zéro de l'animation
     Q.input.on('reset', stage, function(e) {
-      Q.stage().pause();
-      LunarLander.reset($V([45, 1, 51, -1]));
-      Q.stage().unpause();
+		// Mettre l'animation en pause
+		Q.stage().pause();
+		// Réinitialiser le module
+		LunarLander.reset($V([45, 1, 51, -1]));
+		// Reprendre l'animation
+		Q.stage().unpause();
     });
     
-    // Boucle de jeu
+    // Définir la boucle de l'animation
     Q.gameLoop(function(dt) {
-      // fixe Te
       _fixe(dt);
       Q.stageGameLoop(dt);
     });
     
-    // Bouton permettant le retour au menu
-    var button = stage.insert(new Q.UI.Button({ x: 0+50, y: 0+30, fill: "#CCCCCC",
-      label: "Menu", type: Q.SPRITE_UI },
+    // Afficher le bouton de retour au menu
+    var button = stage.insert(new Q.UI.Button({x:0+50, y:0+30, fill:"#CCCCCC", label:"Menu", type:Q.SPRITE_UI},
       function() {
-        Q.clearStages();
-        Q.panel.hide();
-        Q.panel.hideAll();
-        Q.stageScene('main_menu');}
-    ));
+		  // Réinitialiser l'animation
+		  Q.clearStages();
+		  // Masquer les panels
+		  Q.panel.hide();
+		  Q.panel.hideAll();
+		  // Afficher le menu principal
+		  Q.stageScene('main_menu');
+    }));
   });
 
-  // Fin du jeu, lorsque Lunar alunit
+  // Définir la fin de l'animation
   Q.scene('endLunarGame',function(stage) {
+    // Initialiser l'affichage du résultat
     var box = stage.insert(new Q.UI.Container({
       x: Q.width/2, y: Q.height/2, fill: "rgba(0,0,0,0.5)"
     }));
     
-    // Calcul de la vitesse d'alunissage
+    // Calculer la vitesse d'alunissage du module
     var ll = LunarLander;
     var vitImpact = Math.sqrt(ll.state.e(2)*ll.state.e(2) + ll.state.e(4)*ll.state.e(4)).toFixed(2);
     
-    // Text en fonction de la vitesse
+    // Déterminer le type d'alunissage
     var text_alunissage;
     if(vitImpact < 2)       text_alunissage = "Alunissage en douceur";
     else if(vitImpact < 12) text_alunissage = "Alunissage brutal";
     else                    text_alunissage = "Crash de l'appareil";
     
-           
-    var label = box.insert(new Q.UI.Text({x:10, y: 0, 
-                                          label: text_alunissage+"\nVitesse d'impact: "+vitImpact+"m/s" }));
-    var playAgain = box.insert(new Q.UI.Button({ x: 0, y: 10+label.p.h, fill: "#CCCCCC",
-                                             label: "Play Again", type: Q.SPRITE_UI }));
+    // Afficher le résultat
+    var label = box.insert(new Q.UI.Text({x:10, y:0, label:text_alunissage + "\nVitesse d'impact: " + vitImpact + "m/s"}));
+	// Afficher le bouton de redémarrage
+    var playAgain = box.insert(new Q.UI.Button({x:0, y:10 + label.p.h, fill:"#CCCCCC", label:"Relancer", type:Q.SPRITE_UI}));
     playAgain.on("click", function() {
       Q.clearStages();
       Q.stageScene('lunarGame');
@@ -316,10 +371,9 @@ window.addEventListener("load",function() {
     box.fit(20);
   });
 
-  // Initialisation
-  // Chargement des images
+  // Définir le chargement de l'animation
   Q.load(["lunar.png", "observer.png", "target.png", "mobile.png"],function() {
-    // Lancement du menu principale
+    // Afficher le menu principal
     Q.stageScene("main_menu");
   });
 });

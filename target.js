@@ -1,22 +1,38 @@
+/*
+***************************************************
+* panel.js                                        *
+* 	Panneau de l'animation                        *
+*                                                 *
+* Auteurs :                                       *
+* 	Loïc FAIZANT, Cyril GORRIERI, Maurice RAMBERT *
+*                                                 *
+* Ecole Polytech' Nice Sophia Antipolis           *
+* Sciences Informatiques - 4e année               *
+***************************************************
+*/
+
+// Définir du mobile à observer
 Quintus.Target = function(Q) {
-  
-  // Mobile ayant une position de départ et une vitesse
   Q.Sprite.extend("Target",{
+    // Initialiser le mobile
     init: function(p) {
       this._super(p, {});
-      // Position mathématique en mètres
+      
+	  // Définir la position du mobile
       this.X = p.x;
       this.Y = p.y;
-      // Vitesse en m/s
+      // Définir la vitesse du mobile
       this.vx = (p.vx ? p.vx : 0);
       this.vy = (p.vy ? p.vy : 0);
     },
+	
+	// Définir la boucle du mobile
     step: function(dt) {
-      // x(t+1) = x(t) + vx(t)*dt
+      // Calculer la nouvelle position du mobile
       this.X += this.vx * Q.Te;
-      // y(t+1) = y(t) + vy(t)*dt
       this.Y += this.vy * Q.Te;
-      // Ajustage de la position à l'écran
+	  
+      // Afficher la nouvelle position du mobile
       this.p.x = Q.XtoPx(this.X);
       this.p.y = Q.YtoPy(this.Y);
     }
