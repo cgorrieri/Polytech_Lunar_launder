@@ -1,10 +1,10 @@
 /*
 ***************************************************
 * observeur.js                                    *
-* 	Script principal de l'animation               *
+*     Script principal de l'animation             *
 *                                                 *
 * Auteurs :                                       *
-* 	Loïc FAIZANT, Cyril GORRIERI, Maurice RAMBERT *
+*   Loïc FAIZANT, Cyril GORRIERI, Maurice RAMBERT *
 *                                                 *
 * Ecole Polytech' Nice Sophia Antipolis           *
 * Sciences Informatiques - 4e année               *
@@ -17,38 +17,38 @@ Quintus.Observeur = function(Q) {
     // Initialiser l'observateur
     init: function(p) {
       this._super(p, { 
-	    // Charger l'image de l'observateur
+        // Charger l'image de l'observateur
         asset: "observer.png",
-		// Définir le pas d'animation
+        // Définir la taille de l'image
         scale: 0.5
       });
-	  
-	  // Initialiser la position de l'observateur
+      
+      // Initialiser la position de l'observateur
       this.X = p.x;
       this.Y = p.y;
-	  // Définir la vitesse de l'observateur
+      // Définir la vitesse de l'observateur
       this.V = 5;
-	  // Définir l'angle de rotation
+      // Définir l'angle de rotation
       this.angleRotation = (p.angle ? p.angle : 0);
-	  // Définir le mobile à observer
+      // Définir le mobile à observer
       this.mobile = p.mobile;
-	  
-	  // Initialiser le tableau de mesures
+      
+      // Initialiser le tableau de mesures
       this.teta = new Array();
       this.ci = new Array();
-	  // Définir le nombre limite de mesures
+      // Définir le nombre limite de mesures
       this.nbMesures = 25;
-	  // Initialiser le nombre de mesures effectuées
+      // Initialiser le nombre de mesures effectuées
       this.currMesure = 0;
     },
-	
+    
     // Définir la boucle de l'observateur
     step: function(dt) {
       // Contrôler le nombre de mesures effectuées
       if(this.currMesure < this.nbMesures) {
-		// Ajuster la rotation de l'observateur
+        // Ajuster la rotation de l'observateur
         this.angleRotation -= 0.006;
-		// Ajuster la vitesse de l'observateur
+        // Ajuster la vitesse de l'observateur
         this.vx = this.V * Math.cos(this.angleRotation);
         this.vy = this.V * Math.sin(this.angleRotation);
 
@@ -65,56 +65,56 @@ Quintus.Observeur = function(Q) {
         // Incrémenter le nombre de mesures  
         this.currMesure++;
       }
-	  else if(this.currMesure == this.nbMesures) {
-	    // Calculer la position initiale et la vitesse du mobile
+      else if(this.currMesure == this.nbMesures) {
+        // Calculer la position initiale et la vitesse du mobile
         infoMobile = this.calculeInfoMobile();
         // Afficher les informations du mobile
-        Q.panel.set({"calc_mobile_x_value":infoMobile[0],	"calc_mobile_x_speed":infoMobile[1],
-               "calc_mobile_y_value":infoMobile[2],	"calc_mobile_y_speed":infoMobile[3]});
+        Q.panel.set({"calc_mobile_x_value":infoMobile[0],    "calc_mobile_x_speed":infoMobile[1],
+               "calc_mobile_y_value":infoMobile[2],    "calc_mobile_y_speed":infoMobile[3]});
         
         // Définir la consigne du module lunaire sur le mobile
         mobileDest = new Q.Target({x:infoMobile[0]+infoMobile[1]*this.nbMesures*Q.Te, vx:infoMobile[1],
                 y: infoMobile[2] + infoMobile[3]*this.nbMesures*Q.Te, vy:infoMobile[3]});
         
-		// Définir les attributs du module lunaire
+        // Définir les attributs du module lunaire
         var lunarInfos = {scale:0.1, state:$V([this.X, 0, this.Y,0]) , target:mobileDest};
                 
-		// Traiter le cas d'une commande par retour d'état
+        // Traiter le cas d'une commande par retour d'état
         if(Q.ObserverCommande == "ret") {
-		  // Masquer le panneau de commande optimale
+          // Masquer le panneau de commande optimale
           Q.panel.hideGroup("commandOptimal");
-		  // Insérer le module lunaire avec commande par retour d'état
+          // Insérer le module lunaire avec commande par retour d'état
           Q.stage().insert(new Q.LunarRetourEtat(lunarInfos));
         }
-		// Traiter le cas d'une commande optimale
-		else if (Q.ObserverCommande == "opt") {
-		  // Mettre l'animation en pause
+        // Traiter le cas d'une commande optimale
+        else if (Q.ObserverCommande == "opt") {
+          // Mettre l'animation en pause
           Q.stage().pause();
-		  // Insérer le module lunaire avec commande optimale
+          // Insérer le module lunaire avec commande optimale
           Q.stage().insert(new Q.LunarOptimal(lunarInfos));
-		  // Afficher le paneau de commande optimale
+          // Afficher le paneau de commande optimale
           Q.panel.showGroup("commandOptimal");
-		  // Contrôler la présence des valeurs propres de la commande optimale
+          // Contrôler la présence des valeurs propres de la commande optimale
           if(Q.Kn == null)
             alert("Veuillez selectionner le fichier de commande (dans le panel)");
           else
-		    // Reprendre l'animation
-			Q.stage().unpause();
+            // Reprendre l'animation
+            Q.stage().unpause();
         }
         
         // Incrémenter le nombre de mesures effectuées
         this.currMesure++;
       }
     },
-	
-	// --- Fonction calculeInfoMobile
-	//	Calcule la position initiale et la vitesse du mobile
+    
+    // --- Fonction calculeInfoMobile
+    //    Calcule la position initiale et la vitesse du mobile
     calculeInfoMobile: function() {
       // Initialiser la matrice ci(t)
       var ci = new Array();
-	  // Parcourir les mesures effectuées
+      // Parcourir les mesures effectuées
       for(var i = 0; i < this.teta.length; i++) {
-		// Construire la matrice ci(t)
+        // Construire la matrice ci(t)
         ci.push($M([
           [Math.sin(this.teta[i].angle)],
           [this.teta[i].t * Math.sin(this.teta[i].angle)],
@@ -122,25 +122,25 @@ Quintus.Observeur = function(Q) {
           [this.teta[i].t * Math.cos(this.teta[i].angle)]])
         );
       }
-	  
-	  // Initialiser la matrice y(t)
+      
+      // Initialiser la matrice y(t)
       var y = new Array();
-	  // Parcourir les mesures effectuées
+      // Parcourir les mesures effectuées
       for(var i = 0; i < this.teta.length; i++) {
-		// Construire la matrice y(t)
+        // Construire la matrice y(t)
         y.push((-(this.teta[i].y) * Math.sin(this.teta[i].angle)) + (this.teta[i].x * Math.cos(this.teta[i].angle)));
       }
-	  
-	  // Initialiser la matrice Gamma
+      
+      // Initialiser la matrice Gamma
       var gamma = $M([
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0]
       ]);
-	  // Parcourir les mesures effectuées
+      // Parcourir les mesures effectuées
       for(var i = 0; i < ci.length; i++) {
-	    // Construire la matrice Gamma
+        // Construire la matrice Gamma
         gamma = gamma.add(ci[i].multiply(ci[i].transpose()));
       }
       
@@ -151,9 +151,9 @@ Quintus.Observeur = function(Q) {
         [0],
         [0]
       ]);
-	  // Parcourir les mesures effectuées
+      // Parcourir les mesures effectuées
       for(var i = 0; i < ci.length; i++) {
-	    // Construire la matrice b
+        // Construire la matrice b
         b = b.add(ci[i].x(y[i]));
       }
       
@@ -162,16 +162,16 @@ Quintus.Observeur = function(Q) {
       var equations = ga.augment(b);
       var eqns = equations.toRightTriangular();
       
-	  // Calculer la vitesse du mobile (ordonnée)
+      // Calculer la vitesse du mobile (ordonnée)
       var sol_vy = eqns.e(4,5) / eqns.e(4,4);
-	  // Calculer la position initiale du mobile (ordonnée)
+      // Calculer la position initiale du mobile (ordonnée)
       var sol_y =(eqns.e(3,5) - eqns.e(3,4)*sol_vy) / eqns.e(3,3);
-	  // Calculer la vitesse du mobile (abscisse)
+      // Calculer la vitesse du mobile (abscisse)
       var sol_vx = (eqns.e(2,5) - eqns.e(2,4)*sol_vy - eqns.e(2,3)*sol_y) / eqns.e(2,2);
-	  // Calculer la position initiale du mobile (abscisse)
+      // Calculer la position initiale du mobile (abscisse)
       var sol_x = (eqns.e(1,5) - eqns.e(1,4)*sol_vy - eqns.e(1,3)*sol_y - eqns.e(1,2)*sol_vx) / eqns.e(1,1);
       
-	  // Renvoyer la matrice résultante
+      // Renvoyer la matrice résultante
       var res = [-sol_x, -sol_vx, -sol_y, sol_vy];
       return res;
     }
@@ -182,7 +182,7 @@ Quintus.Observeur = function(Q) {
     // Initialiser le mobile
     init: function(p) {
       this._super(p, {scale:0.25});
-	  // Définir la vitesse du mobile
+      // Définir la vitesse du mobile
       this.vx = this.vy = Vmobile;
       // Fixer la référence du mobile en son centre
       this.p.cx = this.p.w/2;

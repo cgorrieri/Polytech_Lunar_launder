@@ -1,10 +1,10 @@
 /*
 ***************************************************
 * panel.js                                        *
-* 	Panneau de l'animation                        *
+*     Panneau de l'animation                      *
 *                                                 *
 * Auteurs :                                       *
-* 	Loïc FAIZANT, Cyril GORRIERI, Maurice RAMBERT *
+*   Loïc FAIZANT, Cyril GORRIERI, Maurice RAMBERT *
 *                                                 *
 * Ecole Polytech' Nice Sophia Antipolis           *
 * Sciences Informatiques - 4e année               *
@@ -51,7 +51,7 @@ Quintus.Panel = function(Q) {
     },
 
     set: function(properties, value) {
-	  // Contrôler la multiplicité des propriétés à modifier
+      // Contrôler la multiplicité des propriétés à modifier
       if(Q._isObject(properties)) {
         Q._each(properties,this._setProperty,this);
       } else {
@@ -63,32 +63,32 @@ Quintus.Panel = function(Q) {
     hide: function() {
       this.hideEl(this.id);
     },
-	
+    
     // Définir l'affichage du panneau
     show: function() {
       this.showEl(this.id);
     },
-	
-	// Définir le non-affichage d'un élément
+    
+    // Définir le non-affichage d'un élément
     hideEl: function(el) {
       document.getElementById(el).style.display="none";
     },
-	
-	// Définir l'affichage d'un élément
+    
+    // Définir l'affichage d'un élément
     showEl: function(el) {
       document.getElementById(el).style.display="block";
     },
-	
+    
     // Définir le non-affichage d'un groupe d'éléments
     hideGroup: function(groups) {
-	  // Contrôler la multiplicité des éléments à masquer
+      // Contrôler la multiplicité des éléments à masquer
       if(groups instanceof Array) {
         Q._each(groups,this.hideEl,this);
       } else {
         this.hideEl(groups);
       }
     },
-	
+    
     // Définir le non-affichage de tous les éléments
     hideAll: function() {
        Q._each(this.groups,this.hideEl,this);
@@ -96,7 +96,7 @@ Quintus.Panel = function(Q) {
     
     // Définir l'affichage d'un groupe d'éléments
     showGroup: function(groups) {
-	  // Contrôler la multiplicité des éléments à masquer
+      // Contrôler la multiplicité des éléments à masquer
       if(groups instanceof Array) {
         Q._each(groups,this.showEl,this);
       } else {
