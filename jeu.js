@@ -78,14 +78,14 @@ window.addEventListener("load", function() {
   
   // --- Fonction XtoPx
   //    Convertit la position (abscisse) en pixels
-  //        x :
-  //            position à convertir
+  //      x :
+  //        position à convertir
   Q.XtoPx = function(x) {return x * Q.ScalePM;}
   
   // --- Fonction YtoPx
   //    Convertit la position (ordonnée) en pixels
-  //        y :
-  //            position à convertir
+  //      y :
+  //        position à convertir
   Q.YtoPy = function(y) {return Q.height - y * Q.ScalePM;}
   
   // Définir le menu principal de la simulation
@@ -196,8 +196,8 @@ window.addEventListener("load", function() {
     
     // --- Fonction addTargetX
     //    Déplace la consigne de commande en abscisse
-    //        ax :
-    //            déplacement de consigne
+    //      ax :
+    //        déplacement de consigne
     addTargetX = function(ax) {
       // Contrôler la validité du déplacement
       if(LunarLander.Cn.e(1) + ax >= 0) {
@@ -209,8 +209,8 @@ window.addEventListener("load", function() {
     
     // --- Fonction addTargetY
     //    Déplace la consigne de commande en abscisse
-    //        ay :
-    //            déplacement de consigne
+    //      ay :
+    //        déplacement de consigne
     addTargetY = function(ay) {
       // Contrôler la validité du déplacement
       if(LunarLander.Cn.e(3) + ay >= 0) {
